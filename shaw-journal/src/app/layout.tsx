@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { metadata } from "./metadata"; // Import metadata from separate file
 import { AuthProvider } from "../components/context/AuthContext"; // Import AuthProvider
+import PageBackground from "../components/PageBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              {children}
+              <PageBackground>
+                {children}
+              </PageBackground>
             </motion.div>
           </AnimatePresence>
         </AuthProvider>
