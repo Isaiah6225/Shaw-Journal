@@ -1,79 +1,40 @@
-"use client";
-
-import Image from "next/image";
-import React, { useState } from "react";
-import { getFormattedDateString } from "@/lib/utils";
-
 import Link from "next/link";
-import UpvoteBtn from "./interactions/UpvoteBtn";
-import ThoughtBtn from "./interactions/ThoughtBtn";
-import ProfileButton from "./ui/ProfileButton";
+import { useLikes } from "./hooks/useLikes";
 
-type props = {
-  post: DBPost;
-};
+export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments }) {
+  const { isLiked, likesCount, toggleLike } = useLikes(id);
 
-function BlogCard({ post }: props) {
-  const [loading] = useState<boolean>(false);
+  // Convert Firestore Timestamp to JavaScript Date
+  const formattedDate = createdAt?.seconds
+    ? new Date(createdAt.seconds * 1000).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Unknown Date";
 
-
-  return !loading ? (
-    <div className="border-b py-2 flex flex-col gap-2 h-50">
-      {/* Top section */}
-      <Link
-        href={`/post/${post.slug}?postID=${post.id}`}
-        className="flex basis-5/6 flex-col-reverse md:flex-row gap-4"
-      >
-        {/* Blog left content */}
-        <div className="basis-3/4">
-          {/* Meta section */}
-          <div className="flex items-center gap-2 mb-1">
-            <div>
-              <ProfileButton sizing="w-6 h-6" />
-            </div>
-            <small className="font-semibold opacity-70">Matthew Carby</small>
-          </div>
-          {/* Blog title */}
-          <h1 className="font-bold text-2xl line-clamp-2">{post?.title}</h1>
-          {/* Snippet */}
-          <div className="min-h-24 md:min-h-28 2xl:min-h-20 mb-4">
-            <p className="font-light line-clamp-6 md:line-clamp-4 2xl:line-clamp-3">
-              {post?.snippet}
-            </p>
-          </div>
-          {/* Interactions */}
-          <div className="flex space-x-4">
-            {/* Upvotes */}
-            <UpvoteBtn staleUpvoteCount={post?.upvoteCount??0} postId={post?.id} />
-            {/* Thoughts */}
-            <ThoughtBtn location={'home'} thoughtCount={post?.thoughtCount} />
-
-            
-            {/* Date published */}
-            <div className="bg-slate-100/50 dark:bg-stone-900 p-2 rounded-full flex gap-2">
-              <div className="flex space-x-1 items-center justify-center text-xs">
-                <p>{getFormattedDateString(post?.datePublished as Date)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Blog right content */}
-        <div className="basis-1/4 flex items-center md:justify-center">
-          {post?.thumbnail !== "" && (
-            <Image
-              src={post?.thumbnail}
-              alt="blog poster"
-              width={200}
-              height={200}
-              className="h-40 w-40 object-cover rounded"
-              quality={100}
-              priority
-            />
-          )}
-        </div>
+  return (
+    <div className="bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition">
+      <Link href={`/blog/${id}`} className="block">
+        <h2 className="text-gray-800 text-xl font-semibold mt-2">{title}</h2>
+        <p className="text-gray-600 mt-2 line-clamp-2">{article}</p>
       </Link>
+
+      {/* Blog Metadata */}
+      <div className="mt-4 flex justify-between text-sm text-gray-500">
+        <p>By <span className="font-semibold">{author}</span></p>
+        <p>{formattedDate}</p> {/* Display formatted date */}
+      </div>
+
+      {/* Likes & Comments */}
+      <div className="mt-3 flex justify-between items-center text-gray-600">
+        <button onClick={toggleLike} className="flex items-center space-x-2">
+          <span className={isLiked ? "text-red-500" : "text-gray-500"}>❤️</span>
+          <span>{likesCount} Likes</span>
+        </button>
+        <p>💬 {comments?.length || 0} Comments</p>
+      </div>
     </div>
-  ) : null;
+  );
 }
 
-export default BlogCard;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "../firebase"; // Ensure correct Firebase import
+import { auth } from "../firebase"; // ✅ Ensure correct import
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function PrivateRoutes({ children }: { children: React.ReactNode }) {
@@ -15,29 +15,29 @@ export default function PrivateRoutes({ children }: { children: React.ReactNode 
       if (currentUser) {
         setUser(currentUser);
       } else {
-        router.replace("/"); // Redirect to login if not authenticated
+        router.replace("/"); // Redirect if not authenticated
       }
       setLoading(false);
     });
 
-    return () => unsubscribe(); // Cleanup listener when component unmounts
+    return () => unsubscribe(); // Cleanup listener
   }, [router]);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Firebase sign-out
-      router.replace("/"); // Redirect to login after signing out
+      await signOut(auth);
+      router.replace("/"); // Redirect to login
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
 
   if (loading) {
-    return <p className="text-center mt-10">Checking authentication...</p>;
+    return <p>Loading...</p>; // ✅ Show loading state instead of blank screen
   }
 
   if (!user) {
-    return null; // Prevent unauthorized content from flashing
+    return null; // Prevent unauthorized content flash
   }
 
   return (
