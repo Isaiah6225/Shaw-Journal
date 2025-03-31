@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-300`} >
         <AuthProvider>
           <AnimatePresence mode="wait">
             <motion.div
@@ -39,10 +39,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              <PageBackground>
                 {children}
-              </PageBackground>
-            </motion.div>
+             </motion.div>
           </AnimatePresence>
         </AuthProvider>
       </body>
