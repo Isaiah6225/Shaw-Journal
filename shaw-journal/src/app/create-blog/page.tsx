@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "../../firebase"; // Adjust based on your setup
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
+import { useAuth } from "../../components/context/AuthContext";
+
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
@@ -15,6 +17,7 @@ export default function CreateBlog() {
   const [category, setCategory] = useState(""); // New state for category
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const { user } = useAuth();
   const router = useRouter();
 
   // Function to handle blog submission
@@ -27,13 +30,17 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
-      await addDoc(collection(db, "blogs"), {
+     const blogRef = await addDoc(collection(db, "blogs"), {
         title,
         name,
         article,
         category, // Save category to Firestore
         createdAt: serverTimestamp(),
       });
+	
+      //save blog to specific current user
+
+      await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
       setMessage("Blog created successfully!");
       router.push("/home"); // Redirect to home after submission
     } catch (error: any) {

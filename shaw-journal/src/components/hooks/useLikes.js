@@ -10,7 +10,7 @@ export function useLikes(blogId) {
 
   useEffect(() => {
     if (!blogId || !user) return;
-
+    console.log("Current user: ", user.uid);
     const checkLikeStatus = async () => {
       try {
         const likeRef = doc(db, "likes", `${user.uid}_${blogId}`);

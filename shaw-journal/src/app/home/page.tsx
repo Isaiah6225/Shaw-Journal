@@ -1,9 +1,6 @@
 "use client";
 
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
-import { db } from "../../firebase";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
-import Link from "next/link";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
