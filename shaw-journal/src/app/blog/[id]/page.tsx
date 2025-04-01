@@ -44,7 +44,9 @@ export default function BlogPage() {
     try {
       const blogRef = doc(db, "blogs", id);
       await updateDoc(blogRef, { comments: arrayUnion(newComment) });
-      setBlog((prev: any) => ({ ...prev, comments: [...prev.comments, newComment] }));
+      setBlog((prev) => ({...prev!, comments: [...(prev?.comments || []), newComment], // Ensure comments is always an array
+}));
+
       setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);

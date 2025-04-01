@@ -4,11 +4,11 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 export default function EditPosts(){
     return (
 
-<PrivateRoutes> 
-<Container>           
-<div> Hello </div>
-</Container>
-</PrivateRoutes>
+	<PrivateRoutes> 
+		<Container>           
+			<div> Hello </div>
+		</Container>
+	</PrivateRoutes>
     );
 }
 

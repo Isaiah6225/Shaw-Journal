@@ -21,6 +21,9 @@ export default function Container({ children }: { children: React.ReactNode }) {
 	  <Link href="/liked-posts" className="bg-green-500 text-white px-4 py-2 rounded-lg">
             ❤️ Liked Posts
           </Link>
+	  <Link href="/edit-posts" className="bg-green-500 text-white px-4 py-2 rounded-lg">
+	    ✏️ Edit Posts
+	  </Link>
         </div>
       {children}
     </div>
