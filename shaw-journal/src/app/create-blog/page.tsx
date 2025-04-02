@@ -34,8 +34,9 @@ export default function CreateBlog() {
         title,
         name,
         article,
-        category, // Save category to Firestore
-        createdAt: serverTimestamp(),
+        category,
+	status: "pending",
+	createdAt: serverTimestamp(),
       });
 	
       //save blog to specific current user
@@ -92,6 +93,7 @@ export default function CreateBlog() {
               <option value="Sports">Sports</option>
               <option value="General">General</option>
               <option value="Tech">Tech</option>
+	      <option value="Entertainment">Entertainment</option>
             </select>
 
             <button

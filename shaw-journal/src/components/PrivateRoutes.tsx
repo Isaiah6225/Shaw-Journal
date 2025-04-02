@@ -23,14 +23,7 @@ export default function PrivateRoutes({ children }: { children: React.ReactNode 
     return () => unsubscribe(); // Cleanup listener
   }, [router]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/"); // Redirect to login
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
+
 
   if (loading) {
     return <p>Loading...</p>; // ✅ Show loading state instead of blank screen
@@ -42,15 +35,6 @@ export default function PrivateRoutes({ children }: { children: React.ReactNode 
 
   return (
     <div>
-      {/* Logout Button */}
-      <div className="flex justify-end p-4">
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg"
-        >
-          Logout
-        </button>
-      </div>
       {children}
     </div>
   );

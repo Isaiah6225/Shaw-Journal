@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../firebase";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { useLikes } from "../../../components/hooks/useLikes"; // Import useLikes hook
+import { useLikes } from "../../../components/hooks/useLikes";
+import { useAuth } from "../../../components/context/AuthContext";
 
 export default function BlogPage() {
   const { id } = useParams(); 
@@ -14,8 +15,10 @@ export default function BlogPage() {
   const [message, setMessage] = useState<string>("");
   const [newComment, setNewComment] = useState<string>("");
   const router = useRouter();
-  
-  const { isLiked, likesCount, toggleLike } = useLikes(id); // Use the custom likes hook
+  const { user, loadingUser } = useAuth();
+  const { isLiked, likesCount, toggleLike } = useLikes(id);
+
+  if (loadingUser) return <p> Loading...</p>;
 
   useEffect(() => {
     if (!id) return;
@@ -65,12 +68,14 @@ export default function BlogPage() {
 
           {/* Like/Unlike & Comments Section */}
           <div className="flex justify-between mt-6 text-sm text-gray-500">
+	  {user && (
             <button
               onClick={toggleLike}
               className={`px-4 py-2 rounded-lg ${isLiked ? "bg-red-500 text-white" : "bg-gray-200 text-black"}`}
             >
               {isLiked ? "❤️ Liked" : "🤍 Like"} {likesCount}
             </button>
+	    )}
             <span>💬 {blog.comments?.length || 0} Comments</span>
           </div>
 
