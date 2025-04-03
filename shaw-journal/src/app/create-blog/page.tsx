@@ -30,7 +30,7 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
-     const blogRef = await addDoc(collection(db, "blogs"), {
+     const blogRef = await addDoc(collection(db, "pendingBlogs"), {
         title,
         name,
         article,
