@@ -10,7 +10,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function SportsPage() {
-  const { blogs, loading, error } = useFetchBlogs("Sports");   
+  const { blogs, loading, error } = useFetchBlogs("Sports","approved");   
 
 
   return (

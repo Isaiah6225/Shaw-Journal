@@ -7,7 +7,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function TechPage() {
-  const { blogs, loading, error } = useFetchBlogs("Tech");  
+  const { blogs, loading, error } = useFetchBlogs("Tech", "approved");  
   return (
     <PrivateRoutes>
       <Container>

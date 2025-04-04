@@ -6,7 +6,7 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
 
 export default function HomePage() {
-  const { blogs, loading, error } = useFetchBlogs("General");   
+  const { blogs, loading, error } = useFetchBlogs("General","approved");   
   return (
     <PrivateRoutes>
       <Container>

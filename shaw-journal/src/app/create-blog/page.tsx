@@ -5,7 +5,7 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { db } from "../../firebase"; // Adjust based on your setup
+import { db } from "../../firebase"; 
 import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { useAuth } from "../../components/context/AuthContext";
 
@@ -14,7 +14,7 @@ export default function CreateBlog() {
   const [title, setTitle] = useState("");
   const [name, setName] = useState("");
   const [article, setArticle] = useState("");
-  const [category, setCategory] = useState(""); // New state for category
+  const [category, setCategory] = useState(""); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const { user } = useAuth();
@@ -30,7 +30,7 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
-     const blogRef = await addDoc(collection(db, "pendingBlogs"), {
+     const blogRef = await addDoc(collection(db, "blogs"), {
         title,
         name,
         article,
@@ -43,7 +43,7 @@ export default function CreateBlog() {
 
       await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
       setMessage("Blog created successfully!");
-      router.push("/home"); // Redirect to home after submission
+      router.push("/home"); 
     } catch (error: any) {
       setMessage(`Error: ${error.message}`);
     } finally {

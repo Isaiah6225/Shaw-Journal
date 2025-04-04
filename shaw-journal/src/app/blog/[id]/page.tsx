@@ -9,6 +9,7 @@ import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { useLikes } from "../../../components/hooks/useLikes";
 import { useAuth } from "../../../components/context/AuthContext";
 
+
 export default function BlogPage() {
   const { id } = useParams(); 
   const [blog, setBlog] = useState<any>(null);
@@ -56,6 +57,22 @@ export default function BlogPage() {
     }
   };
 
+  const handleSubmitBlogs = async () => {
+	try {
+		const approvedData = {
+			status: "approved"
+		};
+		const blogRef = doc(db, "blogs", id);
+		await updateDoc(blogRef, approvedData);
+		setMessage("Blog approved!");
+		router.push("/home");
+	} catch (error){
+		console.error("Error approving blog: ", error);
+		setMessage("Error approving blog");
+	}
+	
+  };
+
   if (!blog) return <p className="text-center mt-10">{message || "Loading blog..."}</p>;
 
   return (
@@ -67,6 +84,7 @@ export default function BlogPage() {
           <p className="text-gray-700">{blog.article}</p>
 
           {/* Like/Unlike & Comments Section */}
+	  {user?.role === "Author" && (
           <div className="flex justify-between mt-6 text-sm text-gray-500">
 	  {user && (
             <button
@@ -78,8 +96,10 @@ export default function BlogPage() {
 	    )}
             <span>💬 {blog.comments?.length || 0} Comments</span>
           </div>
+	  )}
 
           {/* Comment Section */}
+	  {user?.role === "Author" && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold">Comments</h2>
             <ul className="mt-4 space-y-2">
@@ -100,6 +120,35 @@ export default function BlogPage() {
               </button>
             </div>
           </div>
+	  )}
+	  {user?.role ==="Editor" && (
+	  <div className="flex justify-between mt-6 text-sm">
+			<button
+				className="
+				bg-green-500 
+				text-white
+				px-4 
+				py-2 
+				rounded-lg
+				"
+				onClick={handleSubmitBlogs}
+			>
+			Approve Blog
+			</button>
+
+			<button
+				className="
+				bg-red-500 
+				text-white
+				px-4 
+				py-2 
+				rounded-lg
+				"
+			>
+			Reject Blog 
+			</button>
+	  </div>
+	  )}
         </div>
       </Container>
     </PrivateRoutes>

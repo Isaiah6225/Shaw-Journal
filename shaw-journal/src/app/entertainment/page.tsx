@@ -9,8 +9,8 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
-export default function EditorPage() {
-  const { blogs, loading, error } = useFetchBlogs(null,"pending");   
+export default function EntertainmentPage() {
+  const { blogs, loading, error } = useFetchBlogs("Entertainment","approved");   
 
 
   return (
