@@ -10,7 +10,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function EditorPage() {
-  const { blogs, loading, error } = useFetchBlogs("pending");   
+  const { blogs:allBlogs, loading, error } = useFetchBlogs({status: "pending"});   
 
 
   return (
@@ -22,7 +22,7 @@ export default function EditorPage() {
 
         {/* Display Blogs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{blogs.map((blog) => (
+	{allBlogs.map((blog) => (
 	       <BlogCard 
               	key={blog.id}
               	id={blog.id}

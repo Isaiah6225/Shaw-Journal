@@ -11,7 +11,7 @@ import {
 
 export function useFetchBlogs({
   category,
-  status = "approved",
+  status,
   limitCount
 } = {} ) {
   const [blogs, setBlogs] = useState([]);

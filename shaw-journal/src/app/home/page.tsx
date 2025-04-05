@@ -7,17 +7,17 @@ import BlogCard from "../../components/BlogCard";
 
 export default function HomePage() {
   //fetch newest blogs from firestore
-  const { blogs: generalBlogs } = useFetchBlogs({category: "General", limitCount: 1});
+  const { blogs: generalBlogs } = useFetchBlogs({category: "General", status:"approved", limitCount: 1});
 
   const {
 	blogs: entertainmentBlogs,
 	loading,
 	error
-  } = useFetchBlogs({category: "Entertainment", limitCount: 1});
+  } = useFetchBlogs({category: "Entertainment", status:"approved", limitCount: 1});
 
-  const { blogs: technologyBlogs } = useFetchBlogs({category: "Tech", limitCount: 1});
+  const { blogs: technologyBlogs } = useFetchBlogs({category: "Tech", status:"approved", limitCount: 1});
 
-  const { blogs: sportsBlogs } = useFetchBlogs({category: "Sports", limitCount: 1});
+  const { blogs: sportsBlogs } = useFetchBlogs({category: "Sports", status:"approved", limitCount: 1});
 
   return (
 	<PrivateRoutes>
