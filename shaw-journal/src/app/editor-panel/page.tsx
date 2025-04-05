@@ -10,7 +10,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function EditorPage() {
-  const { blogs, loading, error } = useFetchBlogs(null,"pending");   
+  const { blogs, loading, error } = useFetchBlogs("pending");   
 
 
   return (

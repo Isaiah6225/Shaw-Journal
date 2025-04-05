@@ -37,6 +37,7 @@ export default function Container({ children }: { children: React.ReactNode }) {
             <Link href="/tech" className="text-lg font-bold">Technology</Link>		
 	    <Link href="/entertainment" className="text-lg font-bold">Entertainment</Link>
             <Link href="/general" className="text-lg font-bold">General</Link>
+	    <Link href="/food" className="text-lg font-bold">Food</Link>
           </nav>
 
           {/* Action Buttons */}

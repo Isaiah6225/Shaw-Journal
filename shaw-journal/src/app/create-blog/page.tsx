@@ -94,6 +94,7 @@ export default function CreateBlog() {
               <option value="General">General</option>
               <option value="Tech">Tech</option>
 	      <option value="Entertainment">Entertainment</option>
+	      <option value="Food">Food</option>
             </select>
 
             <button
