@@ -5,16 +5,19 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { db } from "../../firebase"; // Adjust based on your setup
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../firebase"; 
+import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
+import { useAuth } from "../../components/context/AuthContext";
+
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
   const [name, setName] = useState("");
   const [article, setArticle] = useState("");
-  const [category, setCategory] = useState(""); // New state for category
+  const [category, setCategory] = useState(""); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const { user } = useAuth();
   const router = useRouter();
 
   // Function to handle blog submission
@@ -27,15 +30,20 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
-      await addDoc(collection(db, "blogs"), {
+     const blogRef = await addDoc(collection(db, "blogs"), {
         title,
         name,
         article,
-        category, // Save category to Firestore
-        createdAt: serverTimestamp(),
+        category,
+	status: "pending",
+	createdAt: serverTimestamp(),
       });
+	
+      //save blog to specific current user
+
+      await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
       setMessage("Blog created successfully!");
-      router.push("/home"); // Redirect to home after submission
+      router.push("/home"); 
     } catch (error: any) {
       setMessage(`Error: ${error.message}`);
     } finally {
@@ -85,6 +93,8 @@ export default function CreateBlog() {
               <option value="Sports">Sports</option>
               <option value="General">General</option>
               <option value="Tech">Tech</option>
+	      <option value="Entertainment">Entertainment</option>
+	      <option value="Food">Food</option>
             </select>
 
             <button

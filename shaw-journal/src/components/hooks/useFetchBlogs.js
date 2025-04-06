@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  where,
+  limit
+} from "firebase/firestore";
 
-export function useFetchBlogs(category) {
+export function useFetchBlogs({
+  category,
+  status,
+  limitCount
+} = {} ) {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -10,15 +21,29 @@ export function useFetchBlogs(category) {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const q = query(
-          collection(db, "blogs"),
-          where("category", "==", category), // Dynamic category
-          orderBy("createdAt", "desc")
-        );
+        let q;
+
+        if (category) {
+          q = query(
+            collection(db, "blogs"),
+            where("category", "==", category),
+            where("status", "==", status),
+            orderBy("createdAt", "desc"),
+            limit(limitCount)
+          );
+        } else {
+          q = query(
+            collection(db, "blogs"),
+            where("status", "==", status),
+            orderBy("createdAt", "desc"),
+            limit(limitCount)
+          );
+        }
+
         const querySnapshot = await getDocs(q);
         const blogsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...doc.data()
         }));
 
         setBlogs(blogsData);
@@ -31,7 +56,7 @@ export function useFetchBlogs(category) {
     };
 
     fetchBlogs();
-  }, [category]); // Runs when category changes
+  }, [category, status, limitCount]);
 
   return { blogs, loading, error };
 }

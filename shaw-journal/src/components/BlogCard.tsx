@@ -16,7 +16,7 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
   return (
     <div className="bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition">
       <Link href={`/blog/${id}`} className="block">
-        <h2 className="text-gray-800 text-xl font-semibold mt-2">{title}</h2>
+        <h2 className="text-primary text-xl font-semibold mt-2">{title}</h2>
         <p className="text-gray-600 mt-2 line-clamp-2">{article}</p>
       </Link>
 

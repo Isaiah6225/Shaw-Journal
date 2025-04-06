@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { metadata } from "./metadata"; // Import metadata from separate file
 import { AuthProvider } from "../components/context/AuthContext"; // Import AuthProvider
+import PageBackground from "../components/PageBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-300`} >
         <AuthProvider>
           <AnimatePresence mode="wait">
             <motion.div
@@ -38,8 +39,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              {children}
-            </motion.div>
+                {children}
+             </motion.div>
           </AnimatePresence>
         </AuthProvider>
       </body>

@@ -9,8 +9,8 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
-export default function SportsPage() {
-  const { blogs: sportsBlogs, loading, error } = useFetchBlogs({category: "Sports", status:"approved"});   
+export default function EditorPage() {
+  const { blogs:allBlogs, loading, error } = useFetchBlogs({status: "pending"});   
 
 
   return (
@@ -22,7 +22,7 @@ export default function SportsPage() {
 
         {/* Display Blogs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{sportsBlogs.map((blog) => (
+	{allBlogs.map((blog) => (
 	       <BlogCard 
               	key={blog.id}
               	id={blog.id}
@@ -40,4 +40,3 @@ export default function SportsPage() {
     </PrivateRoutes>
   );
 }
-
