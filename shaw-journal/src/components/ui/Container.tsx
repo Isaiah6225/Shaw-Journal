@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 
 
 export default function Container({ children }: { children: React.ReactNode }) {
-  const { user, loadingUser } = useAuth();
+  const { user, loadingUser, isGuest } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -20,6 +20,8 @@ export default function Container({ children }: { children: React.ReactNode }) {
   };
 
   if (loadingUser) return <p>Loading...</p>;
+
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -40,6 +42,8 @@ export default function Container({ children }: { children: React.ReactNode }) {
 	    <Link href="/food" className="text-lg font-bold">Food</Link>
           </nav>
 
+	
+
           {/* Action Buttons */}
           <div className="flex items-center gap-x-4">
             {user?.role === "Author" && (
@@ -53,10 +57,11 @@ export default function Container({ children }: { children: React.ReactNode }) {
               </div>
             )}
             
-            
+           {(user?.role === "Author" || user?.role === "Editor") && ( 
 	    <Link href="/liked-posts" className="bg-green-500 text-white px-4 py-2 rounded-lg">
                   ❤️ Liked Blogs
             </Link>
+	    )}
 
 	    {user?.role === "Editor" && (
 	    <Link href="/editor-panel" className="bg-green-500 text-white px-4 py-2 rounded-lg">
@@ -69,6 +74,7 @@ export default function Container({ children }: { children: React.ReactNode }) {
             >
               Logout
             </button>
+
           </div>
         </div>
       </header>
