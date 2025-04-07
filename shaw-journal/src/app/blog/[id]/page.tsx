@@ -5,7 +5,7 @@ import PrivateRoutes from "../../../components/PrivateRoutes";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../firebase";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, collection } from "firebase/firestore"; // Added collection
 import { useLikes } from "../../../components/hooks/useLikes";
 import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -17,17 +17,22 @@ export default function BlogPage({ status }) {
   const [message, setMessage] = useState<string>("");
   const [newComment, setNewComment] = useState<string>("");
   const router = useRouter();
-  const { user, loadingUser } = useAuth();
+  const { user, loadingUser, isGuest } = useAuth(); // Add isGuest
   const { isLiked, likesCount, toggleLike } = useLikes(id);
 
   if (loadingUser) return <p>Loading...</p>;
 
   useEffect(() => {
-    if (!id) return;
+    // Ensure id is a string before proceeding
+    const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
+    if (!blogId) {
+      setMessage("Invalid blog ID.");
+      return;
+    }
 
     const fetchBlog = async () => {
       try {
-        const docRef = doc(db, "blogs", id);
+        const docRef = doc(db, "blogs", blogId); // Use validated blogId
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setBlog(docSnap.data());
@@ -41,29 +46,67 @@ export default function BlogPage({ status }) {
     };
 
     fetchBlog();
-  }, [id]);
+  }, [id]); // Keep id in dependency array
+
+  // Define the comment structure
+  interface Comment {
+    text: string;
+    userName: string;
+    userId: string;
+    timestamp: Date; // Optional: Add a timestamp
+  }
 
   const handleAddComment = async () => {
-    if (!blog || newComment.trim() === "") return;
+    const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
+    if (!blogId || !blog || newComment.trim() === "" || !user) return; // Ensure user is logged in and blogId is valid
+
     try {
-      const blogRef = doc(db, "blogs", id);
-      await updateDoc(blogRef, { comments: arrayUnion(newComment) });
+      // 1. Fetch user's name from 'users' collection
+      const userRef = doc(db, "users", user.uid); // user.uid is already a string
+      const userSnap = await getDoc(userRef);
+      let userName = "Anonymous"; // Default name
+      if (userSnap.exists()) {
+        // Assuming the user document has a 'name' or 'displayName' field
+        userName = userSnap.data().name || userSnap.data().displayName || "Unknown User";
+      } else {
+        console.warn("User document not found for UID:", user.uid);
+      }
+
+      // 2. Create the comment object
+      const commentToAdd: Comment = {
+        text: newComment.trim(),
+        userName: userName,
+        userId: user.uid,
+        timestamp: new Date(), // Add current timestamp
+      };
+
+      // 3. Update Firestore document
+      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
+      await updateDoc(blogRef, { comments: arrayUnion(commentToAdd) });
+
+      // 4. Update local state
       setBlog((prev) => ({
         ...prev!,
-        comments: [...(prev?.comments || []), newComment],
+        comments: [...(prev?.comments || []), commentToAdd], // Add the object
       }));
-      setNewComment("");
+      setNewComment(""); // Clear the input field
     } catch (error) {
       console.error("Error adding comment:", error);
+      // Optionally, set an error message for the user
     }
   };
 
   const handleSubmitBlogs = async () => {
+    const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
+    if (!blogId) {
+        setMessage("Invalid blog ID for approval.");
+        return;
+    }
     try {
       const approvedData = {
         status: "approved",
       };
-      const blogRef = doc(db, "blogs", id);
+      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
       await updateDoc(blogRef, approvedData);
       setMessage("Blog approved!");
       router.push("/home");
@@ -74,11 +117,16 @@ export default function BlogPage({ status }) {
   };
 
   const handleRejectBlogs = async () => {
+    const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
+     if (!blogId) {
+        setMessage("Invalid blog ID for rejection.");
+        return;
+    }
     try {
       const rejectedData = {
         status: "rejected",
       };
-      const blogRef = doc(db, "blogs", id);
+      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
       await updateDoc(blogRef, rejectedData);
       setMessage("Blog rejected!");
       router.push("/home");
@@ -157,10 +205,10 @@ export default function BlogPage({ status }) {
 
 	  </div>
 
-          {/* Like/Unlike & Comments Section */}
-          {(["Author, Editor"].includes(user?.role) === "Author" && status === "approved") && (
+          {/* Like/Unlike & Comments Count - Show only if NOT guest and Author */}
+          {!isGuest && user?.role === "Author" && blog.status === "approved" && (
             <div className="flex justify-between mt-6 text-sm text-gray-500">
-              {user && (
+              {user && ( // Keep inner check for safety, though outer !isGuest covers it
                 <button
                   onClick={toggleLike}
                   className={`px-4 py-2 rounded-lg ${
@@ -174,21 +222,29 @@ export default function BlogPage({ status }) {
             </div>
           )}
 
-          {/* Comment Section */}
-          {user?.role === "Author" && (
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold">Comments</h2>
-              <ul className="mt-4 space-y-2">
-                {blog.comments?.map((comment: string, index: number) => (
-                  <li key={index} className="bg-gray-500 p-2 rounded-md text-white">
-                    {comment}
-                  </li>
-                ))}
+          {/* Comment Section - Show existing comments for guests, but hide input */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold">Comments</h2>
+            <ul className="mt-4 space-y-4"> {/* Increased spacing */}
+                {blog.comments?.length > 0 ? (
+                  blog.comments.map((comment: Comment, index: number) => (
+                    <li key={index} className="bg-gray-100 p-3 rounded-md border border-gray-200">
+                      <p className="font-semibold text-gray-800">{comment.userName}</p>
+                      <p className="text-gray-600">{comment.text}</p>
+                      {/* Optional: Display timestamp */}
+                      {/* <p className="text-xs text-gray-400 mt-1">{comment.timestamp?.toDate().toLocaleString()}</p> */}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No comments yet.</p>
+                )}
               </ul>
-              <div className="mt-4 flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Add a comment..."
+              {/* Add Comment Input - Show only if NOT guest and Author */}
+              {!isGuest && user?.role === "Author" && (
+                <div className="mt-6 flex gap-2"> {/* Increased margin top */}
+                  <input
+                    type="text"
+                    placeholder="Add a comment..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   className="flex-grow p-2 border rounded-md"
@@ -197,14 +253,15 @@ export default function BlogPage({ status }) {
                   onClick={handleAddComment}
                   className="bg-green-500 text-white px-4 py-2 rounded-lg"
                 >
-                  Add Comment
-                </button>
-              </div>
+                    Add Comment
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          {/* )} */} {/* Removed the outer conditional rendering based on role here, handled inside */}
 
-          {/* Editor Actions */}
-          {user?.role === "Editor" && (
+          {/* Editor Actions - Show only if NOT guest and Editor */}
+          {!isGuest && user?.role === "Editor" && (
             <div className="flex justify-between mt-6 text-sm">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg"
@@ -228,4 +285,3 @@ export default function BlogPage({ status }) {
     </PrivateRoutes>
   );
 }
-
