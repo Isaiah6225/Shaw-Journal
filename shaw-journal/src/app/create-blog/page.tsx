@@ -8,20 +8,33 @@ import { useRouter } from "next/navigation";
 import { db } from "../../firebase"; 
 import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { useAuth } from "../../components/context/AuthContext";
+import { useEffect } from "react"; // Import useEffect
 
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
   const [name, setName] = useState("");
   const [article, setArticle] = useState("");
-  const [category, setCategory] = useState(""); 
+  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const { user } = useAuth();
+  const { user, isGuest, loadingUser } = useAuth(); // Get isGuest and loadingUser
   const router = useRouter();
+
+  // Redirect guest users
+  useEffect(() => {
+    if (!loadingUser && isGuest) {
+      router.push("/home"); // Redirect guests away
+    }
+  }, [isGuest, loadingUser, router]);
 
   // Function to handle blog submission
   const handleSubmit = async (e: React.FormEvent) => {
+    // Double check user is not guest before submitting (though redirect should prevent this)
+    if (isGuest || !user) {
+      setMessage("Guests cannot create blogs.");
+      return;
+    }
     e.preventDefault();
     if (!title || !name || !article || !category) {
       setMessage("All fields are required.");
@@ -30,7 +43,7 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
-     const blogRef = await addDoc(collection(db, "blogs"), {
+      const blogRef = await addDoc(collection(db, "blogs"), {
         title,
         name,
         article,
@@ -38,12 +51,15 @@ export default function CreateBlog() {
 	status: "pending",
 	createdAt: serverTimestamp(),
       });
-	
-      //save blog to specific current user
 
-      await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
+      //save blog to specific current user - Ensure user exists and is not guest
+      if (user && !isGuest) {
+         await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
+      } else {
+         throw new Error("User not authenticated or is a guest.");
+      }
       setMessage("Blog created successfully!");
-      router.push("/home"); 
+      router.push("/home");
     } catch (error: any) {
       setMessage(`Error: ${error.message}`);
     } finally {
@@ -51,8 +67,14 @@ export default function CreateBlog() {
     }
   };
 
+  // Render nothing or a loading indicator while checking auth/guest status
+  if (loadingUser || isGuest) {
+    return <p>Loading...</p>; // Or a more specific message/redirect handled by useEffect
+  }
+
+  // Render the form only if the user is logged in and not a guest
   return (
-    <PrivateRoutes>
+    <PrivateRoutes> {/* PrivateRoutes might handle some auth checks already */}
       <Container>
         <div className="max-w-2xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-10">Create a Blog</h1>
@@ -110,4 +132,3 @@ export default function CreateBlog() {
     </PrivateRoutes>
   );
 }
-
