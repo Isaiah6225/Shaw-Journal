@@ -4,12 +4,29 @@ import { useFetchBlogsSub } from "../../components/hooks/useFetchBlogsSub";
 import BlogCard from "../../components/BlogCard";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
+import { useAuth } from "../../components/context/AuthContext"; // Import useAuth
+import { useEffect } from "react"; // Import useEffect
+import { useRouter } from "next/navigation"; // Import useRouter
 
 export default function EditPosts(){
     const { blogs, loading, error } = useFetchBlogsSub();
-    return (
+    const { isGuest, loadingUser } = useAuth(); // Get guest status and loading state
+    const router = useRouter(); // Initialize router
 
-	<PrivateRoutes> 
+    // Redirect guest users
+    useEffect(() => {
+        if (!loadingUser && isGuest) {
+            router.push("/home"); // Redirect guests away
+        }
+    }, [isGuest, loadingUser, router]);
+
+    // Render loading or nothing if checking auth/guest status
+    if (loadingUser || isGuest) {
+        return <p>Loading...</p>; // Or null, or a dedicated loading component
+    }
+
+    return (
+	<PrivateRoutes>
 		<Container>           
 			{loading && <p>Loading...</p>}
         		{error && <p className="text-red-500">{error}</p>}
@@ -34,4 +51,3 @@ export default function EditPosts(){
 	</PrivateRoutes>
     );
 }
-

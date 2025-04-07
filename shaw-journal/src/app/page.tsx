@@ -4,14 +4,16 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase"; 
+import { auth } from "../firebase";
 import Link from "next/link";
+import { useAuth } from "../components/context/AuthContext"; // Import useAuth
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { loginAsGuest } = useAuth(); // Get loginAsGuest from context
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,8 +21,17 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/home"); // Redirect to the home page after successful login
     } catch (error: any) {
-      setError(error.message); // Display error message
+      if (error.code === "auth/invalid-credential") {
+        setError("Incorrect username/password");
+      } else {
+        setError(error.message); // Display other error messages
+      }
     }
+  };
+
+  const handleGuestLogin = () => {
+    loginAsGuest(); // Set guest state in context
+    router.push("/home"); // Redirect to home
   };
 
   return (
@@ -55,12 +66,20 @@ export default function LoginPage() {
             required
             className="w-full p-2 mb-4 border rounded"
           />
-          <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded">
+          <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded mb-4"> {/* Added margin-bottom */}
             Login
           </button>
         </form>
+        {/* Guest Login Link */}
+        <div className="text-center mt-4">
+          <button
+            onClick={handleGuestLogin}
+            className="text-sm text-indigo-600 hover:text-indigo-800 underline cursor-pointer"
+          >
+            Login as Guest
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
