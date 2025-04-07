@@ -7,14 +7,17 @@ import { usePopup } from "./hooks/usePopup";
 import Popup from "./Popup";
 import { useState } from "react";
 import { db } from "../firebase";
-import { collection, updateDoc, doc } from "firebase/firestore";
+import { collection, updateDoc, doc, deleteDoc} from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments, status }) {
   
+  const router = useRouter();
   const [editArticle, setEditArticle] = useState(article); 
+  const [editTitle, setEditTitle] = useState(title);
   const popup = usePopup();
   const { isLiked, likesCount, toggleLike } = useLikes(id);
-
+  
   // handle edit submit
   const handleSubmit = async (e: React.FormEvent) => {
   	e.preventDefault();
@@ -22,13 +25,26 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
 		const blogRef = doc(db, "blogs", id)
 		await updateDoc(blogRef, {
 			article: editArticle,
+			title: editTitle,
+			status: "pending",
 		});
 		popup.close();
+		router.replace("/home")
 		console.log("Edit article successful")
 	} catch (error) {
 		console.log("Edit article failed: ", error)
 	}
 
+  };
+
+  const handleDelete = async () =>{
+  	try{
+		const blogRef = doc(db, "blogs", id);
+		await deleteDoc(blogRef);
+		router.replace("/home");
+	} catch (error) {
+ 		console.log("Deleting blog went wrong: ", error);
+	}
   };
 
   // Convert Firestore Timestamp to JavaScript Date
@@ -97,8 +113,9 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
 
       {/* Likes & Comments */}
 <div className="flex justify-between items-center text-gray-600 space-x-4">
-  {status === "approved" && (
-    <div className="flex items-center space-x-6">
+{(status !== "pending" &&  status !== "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
+
+    <div className="flex items-center space-x-3">
       <button onClick={toggleLike} className="flex items-center space-x-2">
         <span className={isLiked ? "text-red-500" : "text-gray-500"}>❤️</span>
         <span>{likesCount} Likes</span>
@@ -106,39 +123,62 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
 
       <p>💬 {comments?.length || 0} Comments</p>
     </div>
-  )}
+)}  
 	
+
 {(status === "pending" || status === "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
-  <div>
-    <p className="text-sm font-medium text-gray-500">Status: {status}</p>
+  <div className="p-4 border rounded-lg bg-gray-50 mb-4">
+    <p className={`text-sm font-semibold mb-2 ${
+      status === "pending" ? "text-yellow-500" : "text-red-500"
+    }`}>
+      Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+    </p>
+
+    <button 
+      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200"
+      onClick={handleDelete}
+    >
+      Delete Blog
+    </button>
   </div>
 )}
 
-{(status === "rejected" || status === "pending") && (user?.role === "Author") && (
-  <div>
-  	<button
-		className="text-white bg-green-500 px-4 py-2 rounded-lg"
-		onClick ={popup.open}
-	>
-		Edit Blog
-	</button>
+{(status === "pending" || status === "rejected") && user?.role === "Author" && (
+  <div className="p-4 border rounded-lg bg-gray-50">
+    <button
+      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 mb-4"
+      onClick={popup.open}
+    >
+      Edit Blog
+    </button>
 
-	<Popup isOpen={popup.isOpen} close={popup.close}>
-		<form onSubmit ={handleSubmit} className="flex flex-col gap-4">
-		<textarea
-			value={editArticle}
-			onChange={(e) => setEditArticle(e.target.value)}
-		>
-		</textarea>
-		<button 
-			type="submit"
-			disabled={!editArticle.trim()}
-			className="text-white bg-green-500 px-4 py-2 rounded-lg"
-			>	
-			Submit
-		</button>
-		</form>
-	</Popup>
+    <Popup isOpen={popup.isOpen} close={popup.close}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
+        <h1 className="text-xl font-bold">Edit Blog</h1>
+
+        <label className="text-md font-semibold">Title</label>
+        <textarea
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          className="p-2 border rounded h-10"
+        />
+
+        <label className="text-md font-semibold">Article</label>
+        <textarea
+          value={editArticle}
+          onChange={(e) => setEditArticle(e.target.value)}
+          className="p-2 border rounded h-40"
+        />
+
+        <button 
+          type="submit"
+          disabled={!editArticle.trim()}
+          className="bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white px-4 py-2 rounded-lg transition duration-200"
+        >	
+          Submit
+        </button>
+      </form>
+    </Popup>
   </div>
 )}
 

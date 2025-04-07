@@ -106,57 +106,57 @@ export default function BlogPage({ status }) {
 
           {/* Markdown-formatted article */}
           <div className="prose prose-lg max-w-none text-gray-700">
-<ReactMarkdown
-  remarkPlugins={[remarkGfm]}
-  components={{
-    a: ({ node, ...props }) => (
-      <a
-        {...props}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-600 underline"
-      />
-    ),
-    h1: ({ node, ...props }) => (
-      <h1 className="text-3xl font-bold text-primary" {...props} />
-    ),
-    h2: ({ node, ...props }) => (
-      <h2 className="text-2xl font-semibold text-primary" {...props} />
-    ),
-    h3: ({ node, ...props }) => (
-      <h3 className="text-xl font-bold text-primary" {...props} />
-    ),
-    h4: ({ node, ...props }) => (
-      <h4 className="text-lg font-bold text-primary" {...props} />
-    ),
-    h5: ({ node, ...props }) => (
-      <h5 className="text-md font-bold text-primary" {...props} />
-    ),
-    p: ({ node, ...props }) => (
-      <p className="text-gray-700 leading-relaxed" {...props} />
-    ),
-    ul: ({ node, ...props }) => (
-      <ul className="list-disc pl-5 text-gray-700" {...props} />
-    ),
-    ol: ({ node, ...props }) => (
-      <ol className="list-decimal pl-5 text-gray-700" {...props} />
-    ),
-    li: ({ node, ...props }) => (
-      <li className="text-gray-700" {...props} />
-    ),
-    blockquote: ({ node, ...props }) => (
-      <blockquote className="border-l-4 pl-4 text-gray-500 italic" {...props} />
-    ),
-    code: ({ node, ...props }) => (
-      <code className="bg-gray-200 p-1 rounded-md text-sm">{props.children}</code>
-    ),
-  }}
->
-  {blog.article}
-</ReactMarkdown>
-
-	  </div>
-
+  <div className="flex flex-col space-y-6">
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        a: ({ node, ...props }) => (
+          <a
+            {...props}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          />
+        ),
+        h1: ({ node, ...props }) => (
+          <h1 className="text-3xl font-bold text-primary" {...props} />
+        ),
+        h2: ({ node, ...props }) => (
+          <h2 className="text-2xl font-semibold text-primary" {...props} />
+        ),
+        h3: ({ node, ...props }) => (
+          <h3 className="text-xl font-bold text-primary" {...props} />
+        ),
+        h4: ({ node, ...props }) => (
+          <h4 className="text-lg font-bold text-primary" {...props} />
+        ),
+        h5: ({ node, ...props }) => (
+          <h5 className="text-md font-bold text-primary" {...props} />
+        ),
+        p: ({ node, ...props }) => (
+          <p className="text-gray-700 leading-relaxed" {...props} />
+        ),
+        ul: ({ node, ...props }) => (
+          <ul className="list-disc pl-5 text-gray-700" {...props} />
+        ),
+        ol: ({ node, ...props }) => (
+          <ol className="list-decimal pl-5 text-gray-700" {...props} />
+        ),
+        li: ({ node, ...props }) => (
+          <li className="text-gray-700" {...props} />
+        ),
+        blockquote: ({ node, ...props }) => (
+          <blockquote className="border-l-4 pl-4 text-gray-500 italic" {...props} />
+        ),
+        code: ({ node, ...props }) => (
+          <code className="bg-gray-200 p-1 rounded-md text-sm">{props.children}</code>
+        ),
+      }}
+    >
+      {blog.article}
+    </ReactMarkdown>
+  </div>
+</div>
           {/* Like/Unlike & Comments Section */}
           {(["Author, Editor"].includes(user?.role) === "Author" && status === "approved") && (
             <div className="flex justify-between mt-6 text-sm text-gray-500">
