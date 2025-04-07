@@ -70,7 +70,7 @@ export default function CreateBlog() {
               type="text"
               placeholder="Author"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+ubmit             onChange={(e) => setName(e.target.value)}
               required
               className="p-2 border rounded"
             />

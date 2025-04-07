@@ -10,7 +10,26 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function EditorPage() {
-  const { blogs:allBlogs, loading, error } = useFetchBlogs({status: "pending"});   
+  const { blogs: pendingBlogs, loading, error } = useFetchBlogs({status: "pending"});
+
+  const { blogs: rejectedBlogs } = useFetchBlogs({status: "rejected"}); 
+
+  
+
+
+    const renderBlogCards = (blogs) =>
+    blogs.map((blog) => (
+      <BlogCard
+        key={blog.id}
+        id={blog.id}
+        title={blog.title}
+        article={blog.article}
+        author={blog.name}
+        upvotes={blog.upvotes || 0}
+        createdAt={blog.createdAt}
+        comments={blog.comments || []}
+      />
+    ));
 
 
   return (
@@ -21,21 +40,20 @@ export default function EditorPage() {
 
 
         {/* Display Blogs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{allBlogs.map((blog) => (
-	       <BlogCard 
-              	key={blog.id}
-              	id={blog.id}
-              	title={blog.title}
-              	article={blog.article}
-              	author={blog.name}
-              	upvotes={blog.upvotes || 0}
-              	createdAt={blog.createdAt}
-              	comments={blog.comments || []}
-            />
-          ))}
-        </div>
+	<div className="grid grid-cols-1 lg:grid-cols-3 gap-12 my-12">
+          {/* LEFT: Pending blogs*/}
+          <div className="space-y-6 items-center">
+            <h1 className="font-semibold text-xl">Pending Blogs</h1>
+            {renderBlogCards(pendingBlogs)}
+          </div>
 
+          {/* RIGHT: Rejected blogs*/}
+          <div className="space-y-6">
+	    <h1 className="font-semibold text-xl">Rejected Blogs</h1>
+
+            {renderBlogCards(rejectedBlogs)}
+          </div>
+        </div>
       </Container>
     </PrivateRoutes>
   );

@@ -25,6 +25,7 @@ export default function EditPosts(){
               					author={blog.name}
               					upvotes={blog.upvotes || 0}
               					createdAt={blog.createdAt}
+						status={blog.status}
               					comments={blog.comments || []}
             				/>
           			))}
