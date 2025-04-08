@@ -11,7 +11,7 @@ import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export default function BlogPage({ status }) {
+export default function BlogPage() {
   const { id } = useParams();
   const [blog, setBlog] = useState<any>(null);
   const [message, setMessage] = useState<string>("");
@@ -20,9 +20,9 @@ export default function BlogPage({ status }) {
   const { user, loadingUser, isGuest } = useAuth(); // Add isGuest
   const { isLiked, likesCount, toggleLike } = useLikes(id);
 
-  if (loadingUser) return <p>Loading...</p>;
 
   useEffect(() => {
+    if(loadingUser) return;
     // Ensure id is a string before proceeding
     const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
     if (!blogId) {
@@ -46,15 +46,17 @@ export default function BlogPage({ status }) {
     };
 
     fetchBlog();
-  }, [id]); // Keep id in dependency array
+  }, [id, loadingUser]); // Keep id in dependency array
 
-  
+  if(loadingUser){
+	return<p>Loading user...</p>
+  }
 
   // Define the comment structure
   interface Comment {
     text: string;
+    timestamp: Date; 
     userName: string;
-    timestamp: Date;  
    }
 
   const handleAddComment = async () => {
@@ -63,10 +65,10 @@ export default function BlogPage({ status }) {
 
     try {
       const commentToAdd: Comment = {
+      	userName: "Unknown",
 	text: newComment.trim(),
 	timestamp: new Date(),
       }
-	
 
       // 1. Fetch user's name from 'users' collection
       if(user){
@@ -77,17 +79,17 @@ export default function BlogPage({ status }) {
 		console.log("Current user name: ", userSnap.data().name);
         	commentToAdd.userName = userSnap.data().name  || "Unknown User";
       	} else {
-        	console.warn("User document not found for UID:", user.uid);
-		commentToAdd.userName = "Annoymous";
+       		console.warn("User doc not found");
+        	commentToAdd.userName = "Anonymous";
       	}
 	
       } else {
-        const guestName = localStorage.getItem("guestName");
-  	commentToAdd.userName = guestName || "Guest";
+		const guestName = localStorage.getItem("guestName");
+      		commentToAdd.userName = guestName || "Guest";
       }
       
       // 3. Update Firestore document
-      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
+      const blogRef = doc(db, "blogs", blogId); 
       const commentsRef = collection(blogRef, "comments");
       await addDoc(commentsRef, commentToAdd);
 
@@ -152,7 +154,7 @@ export default function BlogPage({ status }) {
       <Container>
         <div className="max-w-3xl mx-auto p-6">
           <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
-
+	{/*		
           {blog.image && (
             <img
               src={blog.image}
@@ -160,9 +162,10 @@ export default function BlogPage({ status }) {
               className="w-full h-60 object-cover rounded-lg mb-4"
             />
           )}
-
+	*/}
           {/* Markdown-formatted article */}
           <div className="prose prose-lg max-w-none text-gray-700">
+	  	<div className="flex flex-col space-y-6">
 
 <ReactMarkdown
   remarkPlugins={[remarkGfm]}
@@ -212,7 +215,8 @@ export default function BlogPage({ status }) {
 >
   {blog.article}
 </ReactMarkdown>
-
+	
+		</div>
 	  </div>
 
           {/* Like/Unlike & Comments */}
@@ -231,7 +235,7 @@ export default function BlogPage({ status }) {
             </div>
           )}
 
-          {/* Comment Section - Show existing comments for guests, but hide input */}
+          {/* Comment Section*/}
           <div className="mt-6">
             <h2 className="text-xl font-semibold">Comments</h2>
             <ul className="mt-4 space-y-4"> {/* Increased spacing */}
@@ -269,8 +273,8 @@ export default function BlogPage({ status }) {
             </div>
           {/* )} */} {/* Removed the outer conditional rendering based on role here, handled inside */}
 
-          {/* Editor Actions - Show only if NOT guest and Editor */}
-          {user?.role === "Editor" && (
+          {/* Editor Actions*/}
+          {(user?.role === "Editor" && blog.status !== "approved") && (
             <div className="flex justify-between mt-6 text-sm">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg"

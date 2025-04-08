@@ -24,6 +24,7 @@ export default function HomePage() {
         upvotes={blog.upvotes || 0}
         createdAt={blog.createdAt}
         comments={blog.comments || []}
+	status={blog.status}
       />
     ));
 
