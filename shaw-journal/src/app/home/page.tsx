@@ -6,19 +6,17 @@ import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
 
 export default function HomePage() {
-  const { blogs, loading, error } = useFetchBlogs("General");   
-  return (
-    <PrivateRoutes>
-      <Container>
+  // Fetch newest blogs from Firestore
+  const { blogs: generalBlogs } = useFetchBlogs({ category: "General", status: "approved", limitCount: 1 });
+  const { blogs: technologyBlogs } = useFetchBlogs({ category: "Tech", status: "approved", limitCount: 1 });
+  const { blogs: foodBlogs } = useFetchBlogs({ category: "Food", status: "approved", limitCount: 1 });
+  const { blogs: entertainmentBlogs, loading, error } = useFetchBlogs({ category: "Entertainment", status: "approved", limitCount: 1 });
+  const { blogs: sportsBlogs } = useFetchBlogs({ category: "Sports", status: "approved", limitCount: 1 });
 
-	{loading && <p>Loading...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {/* Display Blogs */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-6 justify-items-center bg-primary">
-  {blogs.map((blog) => (
-    <div key={blog.id} className="w-full max-w-sm"> {/* Limits max width for consistent sizing */}
-      <BlogCard 
+  const renderBlogCards = (blogs) =>
+    blogs.map((blog) => (
+      <BlogCard
+        key={blog.id}
         id={blog.id}
         title={blog.title}
         article={blog.article}
@@ -27,10 +25,32 @@ export default function HomePage() {
         createdAt={blog.createdAt}
         comments={blog.comments || []}
       />
-    </div>
-  ))}
-</div>
+    ));
 
+  return (
+    <PrivateRoutes>
+      <Container>
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 my-12">
+          {/* LEFT: General + Tech */}
+          <div className="space-y-6">
+            {renderBlogCards(generalBlogs)}
+            {renderBlogCards(technologyBlogs)}
+          </div>
+
+          {/* MIDDLE: Food */}
+          <div className="space-y-6">
+            {renderBlogCards(foodBlogs)}
+          </div>
+
+          {/* RIGHT: Entertainment + Sports */}
+          <div className="space-y-6">
+            {renderBlogCards(entertainmentBlogs)}
+            {renderBlogCards(sportsBlogs)}
+          </div>
+        </div>
       </Container>
     </PrivateRoutes>
   );

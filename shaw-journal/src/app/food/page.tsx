@@ -5,8 +5,8 @@ import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCard from "../../components/BlogCard";
 
-export default function HomePage() {
-  const { blogs: generalBlogs, loading, error } = useFetchBlogs({category: "General", status:"approved", limitCount: 1}); 
+export default function FoodPage() {
+  const { blogs: foodBlogs, loading, error } = useFetchBlogs({category: "Food", status:"approved"});   
   return (
     <PrivateRoutes>
       <Container>
@@ -16,7 +16,7 @@ export default function HomePage() {
 
         {/* Display Blogs */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-6 justify-items-center bg-primary">
-  {generalBlogs.map((blog) => (
+  {foodBlogs.map((blog) => (
     <div key={blog.id} className="w-full max-w-sm"> {/* Limits max width for consistent sizing */}
       <BlogCard 
         id={blog.id}

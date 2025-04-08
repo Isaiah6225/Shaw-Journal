@@ -10,7 +10,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function EntertainmentPage() {
-  const { blogs, loading, error } = useFetchBlogs("Entertainment","approved");   
+  const { blogs: entertainmentBlogs, loading, error } = useFetchBlogs({category: "Entertainment", status:"approved"});   
 
 
   return (
@@ -22,7 +22,7 @@ export default function EntertainmentPage() {
 
         {/* Display Blogs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{blogs.map((blog) => (
+	{entertainmentBlogs.map((blog) => (
 	       <BlogCard 
               	key={blog.id}
               	id={blog.id}
