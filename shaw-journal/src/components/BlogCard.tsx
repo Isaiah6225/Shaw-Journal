@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments, status }) {
   
   const router = useRouter();
+  const [popupType, setPopupType] = useState <"edit"|"delete"|null> (null);
   const [editArticle, setEditArticle] = useState(article); 
   const [editTitle, setEditTitle] = useState(title);
   const popup = usePopup();
@@ -136,7 +137,10 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
 
     <button 
       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200"
-      onClick={handleDelete}
+      onClick={() => {
+        setPopupType("delete");
+        popup.open();
+      }}
     >
       Delete Blog
     </button>

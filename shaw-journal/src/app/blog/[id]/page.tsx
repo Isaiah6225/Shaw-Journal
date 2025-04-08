@@ -10,6 +10,8 @@ import { useLikes } from "../../../components/hooks/useLikes";
 import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Popup from "../../../components/Popup";
+import { usePopup } from "../../../components/hooks/usePopup";
 
 export default function BlogPage({ status }) {
   const { id } = useParams();
@@ -19,6 +21,7 @@ export default function BlogPage({ status }) {
   const router = useRouter();
   const { user, loadingUser, isGuest } = useAuth(); // Add isGuest
   const { isLiked, likesCount, toggleLike } = useLikes(id);
+  const popup = usePopup();
 
   if (loadingUser) return <p>Loading...</p>;
 
@@ -284,7 +287,9 @@ export default function BlogPage({ status }) {
 		onClick={handleRejectBlogs}
 		>
                 Reject Blog
-              </button>
+              </button> 
+              <Popup isOpen={popup.isOpen} close={popup.close}>
+</Popoup>
             </div>
           )}
 	
