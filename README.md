@@ -1,9 +1,3 @@
 # Shaw-Journal
+### asdfadsd
 
-
-# test
-
-
-
-
-##### asdfasjkdfaskldfa

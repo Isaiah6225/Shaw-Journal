@@ -32,6 +32,7 @@ export default function SportsPage() {
               	upvotes={blog.upvotes || 0}
               	createdAt={blog.createdAt}
               	comments={blog.comments || []}
+		status={blog.status}
             />
           ))}
         </div>
