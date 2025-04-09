@@ -10,6 +10,7 @@ interface GuestUser {
   uid: string;
   role: "Guest"; // Explicitly set role for guest
   isGuestUser: true;
+  displayName: string;
 }
 
 // Define a type for an authenticated user with a role
@@ -25,36 +26,32 @@ interface AuthContextType {
   isGuest: boolean;
   loadingUser: boolean;
   loginAsGuest: () => void;
-  logoutGuest: () => void; // Optional: Add a way to explicitly log out guest
-}
+  logoutGuest: () => void; }
 
-// Create Context with a default value matching the type
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AppUser | null>(null); // Use the combined type
-  const [isGuest, setIsGuest] = useState(false); // Track guest status
+  const [user, setUser] = useState<AppUser | null>(null); 
+  const [isGuest, setIsGuest] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      // If a real user logs in or is already logged in
       if (currentUser) {
+
         setIsGuest(false); // Ensure guest mode is off
         const userRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userRef);
         const userData = userSnap.data();
-        // Explicitly cast currentUser to AuthenticatedUser and add role
+
         const authenticatedUser: AuthenticatedUser = {
           ...currentUser,
           role: userData?.role // Add role if exists, otherwise it's undefined
         };
         setUser(authenticatedUser);
       } else {
-        // If no real user is logged in, check if we are in guest mode
         if (!isGuest) {
-          setUser(null); // Only set user to null if not in guest mode
-        }
+          setUser(null);         }
       }
       setLoadingUser(false);
     });
@@ -62,10 +59,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [isGuest]); // Add isGuest dependency
 
+
+  //function to generate name of guest user
+  const generateRandomGuestName = () =>{
+  	 const adjectives = ["Swift", "Brave", "Sneaky", "Clever", "Lucky"];
+  	const animals = ["Fox", "Tiger", "Bear", "Eagle", "Shark"];
+  	const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  	const animal = animals[Math.floor(Math.random() * animals.length)];
+  	return `${adj}${animal}${Math.floor(100 + Math.random() * 900)}`;
+  };
+
   // Function to log in as guest
   const loginAsGuest = () => {
-    // Create the guest user object matching the GuestUser interface
-    const guestUser: GuestUser = { uid: "guest", role: "Guest", isGuestUser: true };
+    let guestName = localStorage.getItem("guestName");
+
+    
+    if (!guestName) {
+    	guestName = generateRandomGuestName();
+    	localStorage.setItem("guestName", guestName);
+    }
+  
+
+    const guestUser: GuestUser = { 
+    	uid: "guest", 
+	role: "Guest", 
+	isGuestUser: true,
+	displayName: guestName,
+    };
+
     setUser(guestUser);
     setIsGuest(true);
     setLoadingUser(false); // Ensure loading is false

@@ -5,13 +5,13 @@ import PrivateRoutes from "../../../components/PrivateRoutes";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../firebase";
-import { doc, getDoc, updateDoc, arrayUnion, collection } from "firebase/firestore"; // Added collection
+import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore"; // Added collection
 import { useLikes } from "../../../components/hooks/useLikes";
 import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export default function BlogPage({ status }) {
+export default function BlogPage() {
   const { id } = useParams();
   const [blog, setBlog] = useState<any>(null);
   const [message, setMessage] = useState<string>("");
@@ -20,9 +20,9 @@ export default function BlogPage({ status }) {
   const { user, loadingUser, isGuest } = useAuth(); // Add isGuest
   const { isLiked, likesCount, toggleLike } = useLikes(id);
 
-  if (loadingUser) return <p>Loading...</p>;
 
   useEffect(() => {
+    if(loadingUser) return;
     // Ensure id is a string before proceeding
     const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
     if (!blogId) {
@@ -46,43 +46,52 @@ export default function BlogPage({ status }) {
     };
 
     fetchBlog();
-  }, [id]); // Keep id in dependency array
+  }, [id, loadingUser]); // Keep id in dependency array
+
+  if(loadingUser){
+	return<p>Loading user...</p>
+  }
 
   // Define the comment structure
   interface Comment {
     text: string;
+    timestamp: Date; 
     userName: string;
-    userId: string;
-    timestamp: Date; // Optional: Add a timestamp
-  }
+   }
 
   const handleAddComment = async () => {
     const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
-    if (!blogId || !blog || newComment.trim() === "" || !user) return; // Ensure user is logged in and blogId is valid
+    if (!blogId || !newComment.trim()) return; // Ensure user is logged in and blogId is valid
 
     try {
-      // 1. Fetch user's name from 'users' collection
-      const userRef = doc(db, "users", user.uid); // user.uid is already a string
-      const userSnap = await getDoc(userRef);
-      let userName = "Anonymous"; // Default name
-      if (userSnap.exists()) {
-        // Assuming the user document has a 'name' or 'displayName' field
-        userName = userSnap.data().name || userSnap.data().displayName || "Unknown User";
-      } else {
-        console.warn("User document not found for UID:", user.uid);
+      const commentToAdd: Comment = {
+      	userName: "Unknown",
+	text: newComment.trim(),
+	timestamp: new Date(),
       }
 
-      // 2. Create the comment object
-      const commentToAdd: Comment = {
-        text: newComment.trim(),
-        userName: userName,
-        userId: user.uid,
-        timestamp: new Date(), // Add current timestamp
-      };
-
+      // 1. Fetch user's name from 'users' collection
+      if(user){
+	const userRef = doc(db, "users", user.uid); // user.uid is already a string
+      	const userSnap = await getDoc(userRef);
+      	if (userSnap.exists()) {
+        	// Assuming the user document has a 'name' or 'displayName' field
+		console.log("Current user name: ", userSnap.data().name);
+        	commentToAdd.userName = userSnap.data().name  || "Unknown User";
+      	} else {
+       		console.warn("User doc not found");
+        	commentToAdd.userName = "Anonymous";
+      	}
+	
+      } else {
+		const guestName = localStorage.getItem("guestName");
+      		commentToAdd.userName = guestName || "Guest";
+      }
+      
       // 3. Update Firestore document
-      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
-      await updateDoc(blogRef, { comments: arrayUnion(commentToAdd) });
+      const blogRef = doc(db, "blogs", blogId); 
+      const commentsRef = collection(blogRef, "comments");
+      await addDoc(commentsRef, commentToAdd);
 
       // 4. Update local state
       setBlog((prev) => ({
@@ -95,7 +104,8 @@ export default function BlogPage({ status }) {
       // Optionally, set an error message for the user
     }
   };
-
+  
+  //Handle submitting blogs
   const handleSubmitBlogs = async () => {
     const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
     if (!blogId) {
@@ -106,7 +116,7 @@ export default function BlogPage({ status }) {
       const approvedData = {
         status: "approved",
       };
-      const blogRef = doc(db, "blogs", blogId); // Use validated blogId
+      const blogRef = doc(db, "blogs", blogId);  
       await updateDoc(blogRef, approvedData);
       setMessage("Blog approved!");
       router.push("/home");
@@ -115,7 +125,8 @@ export default function BlogPage({ status }) {
       setMessage("Error approving blog");
     }
   };
-
+  
+  //handle rejecting blogs
   const handleRejectBlogs = async () => {
     const blogId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
      if (!blogId) {
@@ -143,7 +154,7 @@ export default function BlogPage({ status }) {
       <Container>
         <div className="max-w-3xl mx-auto p-6">
           <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
-
+	{/*		
           {blog.image && (
             <img
               src={blog.image}
@@ -151,9 +162,10 @@ export default function BlogPage({ status }) {
               className="w-full h-60 object-cover rounded-lg mb-4"
             />
           )}
-
+	*/}
           {/* Markdown-formatted article */}
           <div className="prose prose-lg max-w-none text-gray-700">
+	  	<div className="flex flex-col space-y-6">
 
 <ReactMarkdown
   remarkPlugins={[remarkGfm]}
@@ -203,14 +215,14 @@ export default function BlogPage({ status }) {
 >
   {blog.article}
 </ReactMarkdown>
-
+	
+		</div>
 	  </div>
 
-          {/* Like/Unlike & Comments Count - Show only if NOT guest and Author */}
-          {!isGuest && user?.role === "Author" && blog.status === "approved" && (
+          {/* Like/Unlike & Comments */}
+          {blog.status === "approved" && (
 
             <div className="flex justify-between mt-6 text-sm text-gray-500">
-              {user && ( // Keep inner check for safety, though outer !isGuest covers it
                 <button
                   onClick={toggleLike}
                   className={`px-4 py-2 rounded-lg ${
@@ -219,12 +231,11 @@ export default function BlogPage({ status }) {
                 >
                   {isLiked ? "❤️ Liked" : "🤍 Like"} {likesCount}
                 </button>
-              )}
               <span>💬 {blog.comments?.length || 0} Comments</span>
             </div>
           )}
 
-          {/* Comment Section - Show existing comments for guests, but hide input */}
+          {/* Comment Section*/}
           <div className="mt-6">
             <h2 className="text-xl font-semibold">Comments</h2>
             <ul className="mt-4 space-y-4"> {/* Increased spacing */}
@@ -241,8 +252,8 @@ export default function BlogPage({ status }) {
                   <p className="text-gray-500">No comments yet.</p>
                 )}
               </ul>
-              {/* Add Comment Input - Show only if NOT guest and Author */}
-              {!isGuest && user?.role === "Author" && (
+              {/* Add Comment Input  */}
+              { blog.status === "approved" && (
                 <div className="mt-6 flex gap-2"> {/* Increased margin top */}
                   <input
                     type="text"
@@ -262,8 +273,8 @@ export default function BlogPage({ status }) {
             </div>
           {/* )} */} {/* Removed the outer conditional rendering based on role here, handled inside */}
 
-          {/* Editor Actions - Show only if NOT guest and Editor */}
-          {!isGuest && user?.role === "Editor" && (
+          {/* Editor Actions*/}
+          {(user?.role === "Editor" && blog.status !== "approved") && (
             <div className="flex justify-between mt-6 text-sm">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg"
