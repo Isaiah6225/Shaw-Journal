@@ -52,6 +52,11 @@ export default function HomePage() {
             {renderBlogCards(sportsBlogs)}
           </div>
         </div>
+
+	{/* */}
+	<div className="grid grid-cols-1 lg:grid-cols-3 gap-12 my-12">
+		<h1 className>General</h1>	
+	</div>
       </Container>
     </PrivateRoutes>
   );
