@@ -10,7 +10,7 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function SportsPage() {
-  const { blogs, loading, error } = useFetchBlogs("Sports","approved");   
+  const { blogs: sportsBlogs, loading, error } = useFetchBlogs({category: "Sports", status:"approved"});   
 
 
   return (
@@ -22,7 +22,7 @@ export default function SportsPage() {
 
         {/* Display Blogs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{blogs.map((blog) => (
+	{sportsBlogs.map((blog) => (
 	       <BlogCard 
               	key={blog.id}
               	id={blog.id}
@@ -32,6 +32,7 @@ export default function SportsPage() {
               	upvotes={blog.upvotes || 0}
               	createdAt={blog.createdAt}
               	comments={blog.comments || []}
+		status={blog.status}
             />
           ))}
         </div>

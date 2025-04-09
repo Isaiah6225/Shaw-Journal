@@ -7,7 +7,24 @@ import BlogCard from "../../components/BlogCard";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function TechPage() {
-  const { blogs, loading, error } = useFetchBlogs("Tech", "approved");  
+  const { blogs: technologyBlogs, loading, error } = useFetchBlogs({category: "Tech", status:"approved"}); 
+
+  const renderBlogCards = (blogs) =>
+    blogs.map((blog) => (
+      <BlogCard
+        key={blog.id}
+        id={blog.id}
+        title={blog.title}
+        article={blog.article}
+        author={blog.name}
+        upvotes={blog.upvotes || 0}
+        createdAt={blog.createdAt}
+        comments={blog.comments || []}
+	status={blog.status}
+
+      />
+    ));
+
   return (
     <PrivateRoutes>
       <Container>
@@ -16,20 +33,8 @@ export default function TechPage() {
         {error && <p className="text-red-500">{error}</p>}
 
         {/* Display Blogs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{blogs.map((blog) => (
-	       <BlogCard 
-              	key={blog.id}
-              	id={blog.id}
-              	title={blog.title}
-              	article={blog.article}
-              	author={blog.name}
-              	upvotes={blog.upvotes || 0}
-              	createdAt={blog.createdAt}
-              	comments={blog.comments || []}
-            />
-          ))}
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">	
+		{renderBlogCards(technologyBlogs)}
         </div>
 
       </Container>

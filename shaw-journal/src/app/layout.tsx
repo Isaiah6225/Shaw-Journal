@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { metadata } from "./metadata"; // Import metadata from separate file
 import { AuthProvider } from "../components/context/AuthContext"; // Import AuthProvider
-import PageBackground from "../components/PageBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
