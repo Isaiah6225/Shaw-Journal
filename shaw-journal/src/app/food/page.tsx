@@ -30,10 +30,14 @@ export default function FoodPage() {
 	{loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
+        <div className="sticky top-0 z-10 bg-primary py-2">
+        <h1 className="text-3xl font-bold text-center text-black">Food Blog</h1>
+        </div>
+
         {/* Display Blogs */}
-	<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-6 justify-items-center bg-primary">
-		{renderBlogCards(foodBlogs)}
-  	</div>
+        <div className="flex flex-col space-y-10 max-w-3xl mx-auto p-6 bg-primary">
+        {renderBlogCards(foodBlogs)}
+        </div>
 
       </Container>
     </PrivateRoutes>
