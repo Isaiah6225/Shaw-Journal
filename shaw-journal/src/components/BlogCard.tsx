@@ -60,7 +60,7 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
   if (loadingUser) return <p>Loading...</p>;
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
+    <div className="bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
       {/* Title wrapped in link */}
       <Link href={`/blog/${id}`}>
         <h2 className="text-primary text-xl font-semibold hover:underline">{title}</h2>

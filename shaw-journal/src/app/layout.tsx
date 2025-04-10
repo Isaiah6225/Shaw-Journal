@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-300`} >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased `} >
         <AuthProvider>
           <AnimatePresence mode="wait">
             <motion.div
