@@ -3,7 +3,7 @@
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
-import BlogCard from "../../components/BlogCard";
+import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import BlogCardHome from "../../components/BlogCardHome";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -30,16 +30,14 @@ export default function HomePage() {
 
   const renderBlogCards = (blogs) =>
     blogs.map((blog) => (
-      <BlogCard
+      <BlogCardLargeHome
         key={blog.id}
         id={blog.id}
         title={blog.title}
         article={blog.article}
         author={blog.name}
-        upvotes={blog.upvotes || 0}
-        createdAt={blog.createdAt}
-        comments={blog.comments || []}
-        status={blog.status}
+	imageUrl={blog.imageUrl}
+	status={blog.status}
       />
     ));
 
@@ -52,6 +50,7 @@ export default function HomePage() {
 			article={blog.article}
 			author={blog.name}
 			createdAt={blog.createdAt}
+			imageUrl={blog.imageUrl}
 		/>
 	));
 

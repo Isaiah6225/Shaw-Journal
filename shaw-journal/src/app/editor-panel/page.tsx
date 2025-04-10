@@ -6,7 +6,7 @@ import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Link from "next/link";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
-import BlogCard from "../../components/BlogCard";
+import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 
 export default function EditorPage() {
@@ -19,15 +19,13 @@ export default function EditorPage() {
 
     const renderBlogCards = (blogs) =>
     blogs.map((blog) => (
-      <BlogCard
+      <BlogCardLargeHome
         key={blog.id}
         id={blog.id}
         title={blog.title}
         article={blog.article}
         author={blog.name}
-        upvotes={blog.upvotes || 0}
-        createdAt={blog.createdAt}
-        comments={blog.comments || []}
+	imageUrl={blog.imageUrl}
 	status={blog.status}
       />
     ));
@@ -43,8 +41,8 @@ export default function EditorPage() {
         {/* Display Blogs */}
 	<div className="grid grid-cols-1 lg:grid-cols-3 gap-12 my-12">
           {/* LEFT: Pending blogs*/}
-          <div className="space-y-6 items-center">
-            <h1 className="font-semibold text-xl">Pending Blogs</h1>
+          <div className="space-y-6 ">
+            <h1 className="font-semibold text-xl text-center">Pending Blogs</h1>
             {renderBlogCards(pendingBlogs)}
           </div>
 

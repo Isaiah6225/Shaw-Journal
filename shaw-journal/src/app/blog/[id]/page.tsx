@@ -5,7 +5,7 @@ import PrivateRoutes from "../../../components/PrivateRoutes";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../firebase";
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore"; 
+import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore";
 import { useLikes } from "../../../components/hooks/useLikes";
 import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -19,7 +19,6 @@ export default function BlogPage() {
   const [newComment, setNewComment] = useState<string>("");
   const router = useRouter();
   const [refreshComments, setRefreshComments] = useState(false);
-
   const { user, loadingUser, isGuest } = useAuth(); 
   const { isLiked, likesCount, toggleLike } = useLikes(id);
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
@@ -136,6 +135,9 @@ export default function BlogPage() {
     }
   };
 
+
+
+
   if (!blog) return <p className="text-center mt-10">{message || "Loading blog..."}</p>;
 
   return (
@@ -245,7 +247,7 @@ export default function BlogPage() {
               </div>
             )}
           </div>
-		
+			
 	  {/* Editor Actions*/}
           {(user?.role === "Editor" && blog.status !== "approved") && (
             <div className="flex justify-between mt-6 text-sm">

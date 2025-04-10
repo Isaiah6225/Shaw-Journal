@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 import { db } from "../../firebase"; 
 import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { useAuth } from "../../components/context/AuthContext";
-import { useEffect } from "react"; // Import useEffect
-
+import { useEffect } from "react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase";
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
@@ -45,11 +46,20 @@ export default function CreateBlog() {
 
     setLoading(true);
     try {
+      let imageUrl ="";
+      
+      if (image) {
+      const imageRef = ref(storage, `blogs/${Date.now()}-${image.name}`);
+      const snapshot = await uploadBytes(imageRef, image);
+      imageUrl = await getDownloadURL(snapshot.ref);
+      }
+
       const blogRef = await addDoc(collection(db, "blogs"), {
         title,
         name,
         article,
         category,
+	imageUrl,
 	status: "pending",
 	createdAt: serverTimestamp(),
       });
@@ -114,7 +124,13 @@ export default function CreateBlog() {
           onSubmit={handleSubmit}
           className="flex flex-col gap-5 md:w-2/3"
         >
-          <input type="file" />
+          <input 
+	    type="file"
+	    accept="image/*"
+	    className="p-2 border rounded cursor-pointer"
+            onChange={(e) => setImage(e.target.files?.[0] || null)}
+	    required
+	  />
           <input
             type="text"
             placeholder="Title"
@@ -154,7 +170,7 @@ export default function CreateBlog() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-indigo-600 text-white p-2 rounded"
+            className="bg-indigo-600 text-white p-2 rounded cursor-pointer"
           >
             {loading ? "Submitting..." : "Create Blog"}
           </button>
