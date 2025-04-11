@@ -27,6 +27,7 @@ export default function BlogPage() {
   const { isLiked, likesCount, toggleLike } = useLikes(id);
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
 
+
 useAOS();
 
 	interface Comment {
@@ -289,7 +290,9 @@ useAOS();
 		onClick={handleRejectBlogs}
 		>
                 Reject Blog
-              </button>
+              </button> 
+              <Popup isOpen={popup.isOpen} close={popup.close}>
+</Popoup>
             </div>
           )}
         </div>

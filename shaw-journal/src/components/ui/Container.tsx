@@ -1,17 +1,19 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import  useAOS  from "../hooks/useAOS";
 
-AOS.init();
 
 export default function Container({ children }: { children: React.ReactNode }) {
   const { user  } = useAuth();
   const router = useRouter();
+
+  useAOS();
 
   const handleLogout = async () => {
     try {

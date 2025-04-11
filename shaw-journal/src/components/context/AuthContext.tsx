@@ -9,7 +9,12 @@ import { doc, getDoc } from "firebase/firestore";
 const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+
+	type CustomUser = User & {
+	  role?: string;
+	};
+
+  const [user, setUser] = useState<CustomUser | null>(null);
 
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

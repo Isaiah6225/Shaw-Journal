@@ -14,6 +14,7 @@ import Image from "next/image";
 export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments, status, imageUrl}) {
   
   const router = useRouter();
+  const [popupType, setPopupType] = useState <"edit"|"delete"|null> (null);
   const [editArticle, setEditArticle] = useState(article); 
   const [editTitle, setEditTitle] = useState(title);
   const popup = usePopup();
@@ -140,6 +141,7 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
 
 
 	</div>
+
     </div>
   );
 }
