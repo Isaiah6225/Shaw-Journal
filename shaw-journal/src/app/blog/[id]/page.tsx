@@ -28,7 +28,7 @@ export default function BlogPage() {
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
 
 
-useAOS();
+ useAOS();
 
 	interface Comment {
 	  userName: string;
@@ -291,8 +291,7 @@ useAOS();
 		>
                 Reject Blog
               </button> 
-              <Popup isOpen={popup.isOpen} close={popup.close}>
-</Popoup>
+
             </div>
           )}
         </div>
