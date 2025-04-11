@@ -43,7 +43,6 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
     }
   };
 
-  if (loadingUser) return <p>Loading ...</p>;
 
   return (
     <div className="mb-6"> {/* Overall wrapper */}
@@ -51,9 +50,10 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
           {imageUrl && (
             <Image
               src={imageUrl}
-              alt="Blog image"
+              alt="Blog image" 
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
+	      quality={100}
               className="object-cover"
             />
           )}

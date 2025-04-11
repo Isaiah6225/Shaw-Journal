@@ -29,7 +29,6 @@ export default function BlogCardHome({ id, title, article, author, createdAt, st
       })
     : "Unknown Date";
 
-  if (loadingUser) return <p>Loading...</p>;
 
   return (
 <div className="mb-6">

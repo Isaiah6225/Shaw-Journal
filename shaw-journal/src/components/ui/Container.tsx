@@ -22,7 +22,6 @@ export default function Container({ children }: { children: React.ReactNode }) {
     }
   };
 
-  if (loadingUser) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-col min-h-screen">
