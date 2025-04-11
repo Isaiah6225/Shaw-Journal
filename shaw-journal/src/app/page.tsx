@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { loginAsGuest } = useAuth(); // Get loginAsGuest from context
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +29,6 @@ export default function LoginPage() {
   };
 
   const handleGuestLogin = () => {
-    loginAsGuest(); // Set guest state in context
     router.push("/home"); // Redirect to home
   };
 

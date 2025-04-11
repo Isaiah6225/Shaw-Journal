@@ -9,8 +9,9 @@ import { useState } from "react";
 import { db } from "../firebase";
 import { collection, updateDoc, doc, deleteDoc} from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments, status }) {
+export default function BlogCard({ id, title, article, author, upvotes, createdAt, comments, status, imageUrl}) {
   
   const router = useRouter();
   const [editArticle, setEditArticle] = useState(article); 
@@ -60,48 +61,59 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
   if (loadingUser) return <p>Loading...</p>;
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
+    <div className="bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
       {/* Title wrapped in link */}
       <Link href={`/blog/${id}`}>
         <h2 className="text-primary text-xl font-semibold hover:underline">{title}</h2>
       </Link>
+      <div>
+	{imageUrl && (
+	  <Image 
+	    src={imageUrl}
+	    alt="Blog image"
+	    width={500}
+	    height={300}
+	    className="rounded-md"
+	  />
+	)}
+      </div>
 
       {/* Markdown preview */}
       <div className="text-gray-600 prose prose-sm max-w-none line-clamp-2 overflow-hidden">
-	<ReactMarkdown
-	  remarkPlugins={[remarkGfm]}
-	  components={{
-	    a: ({ node, ...props }) => (
-	      <a
-		{...props}
-		target="_blank"
-		rel="noopener noreferrer"
-		className="text-blue-600 underline"
-	      />
-	    ),
+		<ReactMarkdown
+		  remarkPlugins={[remarkGfm]}
+		  components={{
+		    a: ({ node, ...props }) => (
+		      <a
+			{...props}
+			target="_blank"
+			rel="noopener noreferrer"
+			className="text-blue-600 underline"
+		      />
+		    ),
 
-	    p: ({ node, ...props }) => (
-	      <p className="text-gray-700 leading-relaxed" {...props} />
-	    ),
-	    ul: ({ node, ...props }) => (
-	      <ul className="list-disc pl-5 text-gray-700" {...props} />
-	    ),
-	    ol: ({ node, ...props }) => (
-	      <ol className="list-decimal pl-5 text-gray-700" {...props} />
-	    ),
-	    li: ({ node, ...props }) => (
-	      <li className="text-gray-700" {...props} />
-	    ),
-	    blockquote: ({ node, ...props }) => (
-	      <blockquote className="border-l-4 pl-4 text-gray-500 italic" {...props} />
-	    ),
-	    code: ({ node, ...props }) => (
-	      <code className="bg-gray-200 p-1 rounded-md text-sm">{props.children}</code>
-	    ),
-	  }}
-	>
-  {article}
-</ReactMarkdown>
+		    p: ({ node, ...props }) => (
+		      <p className="text-gray-700 leading-relaxed" {...props} />
+		    ),
+		    ul: ({ node, ...props }) => (
+		      <ul className="list-disc pl-5 text-gray-700" {...props} />
+		    ),
+		    ol: ({ node, ...props }) => (
+		      <ol className="list-decimal pl-5 text-gray-700" {...props} />
+		    ),
+		    li: ({ node, ...props }) => (
+		      <li className="text-gray-700" {...props} />
+		    ),
+		    blockquote: ({ node, ...props }) => (
+		      <blockquote className="border-l-4 pl-4 text-gray-500 italic" {...props} />
+		    ),
+		    code: ({ node, ...props }) => (
+		      <code className="bg-gray-200 p-1 rounded-md text-sm">{props.children}</code>
+		    ),
+		  }}
+		>
+	  {article}
+	</ReactMarkdown>
 
       </div>
 
@@ -111,78 +123,23 @@ export default function BlogCard({ id, title, article, author, upvotes, createdA
         <p>{formattedDate}</p>
       </div>
 
-      {/* Likes & Comments */}
-<div className="flex justify-between items-center text-gray-600 space-x-4">
-{(status !== "pending" &&  status !== "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
+	      {/* Likes & Comments */}
+	<div className="flex justify-between items-center text-gray-600 space-x-4">
+	{(status !== "pending" &&  status !== "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
 
-    <div className="flex items-center space-x-3">
-      <button onClick={toggleLike} className="flex items-center space-x-2">
-        <span className={isLiked ? "text-red-500" : "text-gray-500"}>❤️</span>
-        <span>{likesCount} Likes</span>
-      </button>
+	    <div className="flex items-center space-x-3">
+	      <button onClick={toggleLike} className="flex items-center space-x-2">
+		<span className={isLiked ? "text-red-500" : "text-gray-500"}>❤️</span>
+		<span>{likesCount} Likes</span>
+	      </button>
 
-      <p>💬 {comments?.length || 0} Comments</p>
-    </div>
-)}  
-	
+	      <p>💬 {comments?.length || 0} Comments</p>
+	    </div>
+	)}  
+		
 
-{(status === "pending" || status === "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
-  <div className="p-4 border rounded-lg bg-gray-50 mb-4">
-    <p className={`text-sm font-semibold mb-2 ${
-      status === "pending" ? "text-yellow-500" : "text-red-500"
-    }`}>
-      Status: {status.charAt(0).toUpperCase() + status.slice(1)}
-    </p>
 
-    <button 
-      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200"
-      onClick={handleDelete}
-    >
-      Delete Blog
-    </button>
-  </div>
-)}
-
-{(status === "pending" || status === "rejected") && user?.role === "Author" && (
-  <div className="p-4 border rounded-lg bg-gray-50">
-    <button
-      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 mb-4"
-      onClick={popup.open}
-    >
-      Edit Blog
-    </button>
-
-    <Popup isOpen={popup.isOpen} close={popup.close}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-        <h1 className="text-xl font-bold">Edit Blog</h1>
-
-        <label className="text-md font-semibold">Title</label>
-        <textarea
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-          className="p-2 border rounded h-10"
-        />
-
-        <label className="text-md font-semibold">Article</label>
-        <textarea
-          value={editArticle}
-          onChange={(e) => setEditArticle(e.target.value)}
-          className="p-2 border rounded h-40"
-        />
-
-        <button 
-          type="submit"
-          disabled={!editArticle.trim()}
-          className="bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white px-4 py-2 rounded-lg transition duration-200"
-        >	
-          Submit
-        </button>
-      </form>
-    </Popup>
-  </div>
-)}
-
-</div>
+	</div>
     </div>
   );
 }
