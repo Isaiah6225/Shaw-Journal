@@ -11,6 +11,10 @@ import { useAuth } from "../../../components/context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchComments } from "../../../components/hooks/useFetchComments";
+import Image from "next/image";
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 
 export default function BlogPage() {
   const { id } = useParams();
@@ -22,6 +26,11 @@ export default function BlogPage() {
   const { user, loadingUser, isGuest } = useAuth(); 
   const { isLiked, likesCount, toggleLike } = useLikes(id);
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
+
+  useEffect(() => {
+    AOS.init();
+  }, []);
+  
 
   useEffect(() => {
     if(loadingUser) return;
@@ -143,6 +152,20 @@ export default function BlogPage() {
   return (
     <PrivateRoutes>
       <Container>
+        
+      {blog.imageUrl && (
+    <div className="mx-auto relative w-[725px] h-[425px] mb-3 rounded-lg overflow-hidden shadow-md">
+    <Image
+      src={blog.imageUrl}
+      alt="Blog cover"
+      fill
+      className="object-cover"
+      sizes="(max-width: 768px) 100vw, 500px"
+      priority 
+    />
+    </div>
+    )}
+
         <div className="max-w-3xl mx-auto p-6">
           <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
           {/* Render Markdown content */}
