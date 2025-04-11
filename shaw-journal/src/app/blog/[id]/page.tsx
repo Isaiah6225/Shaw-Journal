@@ -12,8 +12,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchComments } from "../../../components/hooks/useFetchComments";
 import Image from "next/image";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import  useAOS  from "../../../components/hooks/useAOS";
+
 
 
 export default function BlogPage() {
@@ -27,10 +27,13 @@ export default function BlogPage() {
   const { isLiked, likesCount, toggleLike } = useLikes(id);
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
 
-  useEffect(() => {
-    AOS.init();
-  }, []);
-  
+useAOS();
+
+	interface Comment {
+	  userName: string;
+	  text: string;
+	  timestamp: Date;
+	};
 
   useEffect(() => {
     if(loadingUser) return;

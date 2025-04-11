@@ -8,13 +8,15 @@ import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCardHome from "../../components/BlogCardHome";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import  useAOS  from "../../components/hooks/useAOS";
 
-AOS.init();
+
 
 export default function FoodPage() {
-  const { blogs: foodBlogs, loading: loadingFood, error } = useFetchBlogs({category: "Food", status:"approved"});  
+  const { blogs: foodBlogs, loading: loadingFood, error } = useFetchBlogs({category: "Food", status:"approved"}); 
+
+  
+  useAOS();
 
   const isLoading = loadingFood;
   
@@ -28,6 +30,7 @@ export default function FoodPage() {
         author={blog.name}
 	createdAt={blog.createdAt}
 	imageUrl={blog.imageUrl}
+	status={blog.status}
       />
     ));
 

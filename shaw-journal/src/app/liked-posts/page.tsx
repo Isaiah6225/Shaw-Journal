@@ -8,16 +8,18 @@ import { useAuth } from "../../components/context/AuthContext";
 import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import  useAOS  from "../../components/hooks/useAOS";
 
-AOS.init();
+
 
 export default function LikedPostsPage() {
   const { user } = useAuth();
   const [likedBlogs, setLikedBlogs] = useState([]);
+  useAOS();
 
   useEffect(() => {
+
+    
     if (!user) return;
 
     const fetchLikedBlogs = async () => {
@@ -56,8 +58,8 @@ export default function LikedPostsPage() {
 					title={blog.title}
 					article={blog.article}
 					author={blog.name}
-					createdAt={blog.createdAt}
 					imageUrl={blog.imageUrl}
+					status={blog.status}
 				    />)
         ) : (
           <p>No liked posts yet.</p>

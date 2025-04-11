@@ -19,7 +19,7 @@ export default function CreateBlog() {
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [image, setImage] = useState<any[]>(null);	
+  const [image, setImage] = useState<File | null>(null);	
 
   const { user, isGuest, loadingUser } = useAuth(); // Get isGuest and loadingUser
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function CreateBlog() {
       let imageUrl ="";
       
       if (image) {
-      const imageRef = ref(storage, `blogs/${Date.now()}-${image.name}`);
+      const imageRef = ref(storage, `blogs/${Date.now()}`);
       const snapshot = await uploadBytes(imageRef, image);
       imageUrl = await getDownloadURL(snapshot.ref);
       }

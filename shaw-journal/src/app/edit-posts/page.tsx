@@ -14,12 +14,7 @@ export default function EditPosts(){
     const { isGuest, loadingUser } = useAuth(); // Get guest status and loading state
     const router = useRouter(); // Initialize router
 
-    // Redirect guest users
-    useEffect(() => {
-        if (!loadingUser && isGuest) {
-            router.push("/home"); // Redirect guests away
-        }
-    }, [isGuest, loadingUser, router]);
+
 
 
     const renderBlogCards = (blogs) =>
@@ -35,10 +30,7 @@ export default function EditPosts(){
       />
     ));
 
-    // Render loading or nothing if checking auth/guest status
-    if (loadingUser || isGuest) {
-        return <p>Loading...</p>; // Or null, or a dedicated loading component
-    }
+
 
     return (
 	<PrivateRoutes>

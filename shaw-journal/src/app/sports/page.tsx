@@ -8,13 +8,13 @@ import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCardHome from "../../components/BlogCardHome";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
-AOS.init();
+import   useAOS  from "../../components/hooks/useAOS";
 
 export default function EntertainmentPage() {
-  const { blogs: sportsBlogs, loading: loadingSports, error } = useFetchBlogs({category: "Sports", status:"approved"});  
+  const { blogs: sportsBlogs, loading: loadingSports, error } = useFetchBlogs({category: "Sports", status:"approved"}); 
+
+  useAOS();
+
   
   const isLoading = loadingSports;
   
@@ -28,6 +28,7 @@ export default function EntertainmentPage() {
         author={blog.name}
 	createdAt={blog.createdAt}
 	imageUrl={blog.imageUrl}
+	status={blog.status}
       />
     ));
 
