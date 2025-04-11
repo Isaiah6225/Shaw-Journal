@@ -30,9 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased `} >
         <AuthProvider>
-          <AnimatePresence mode="wait">
+	{/*
+          <AnimatePresence mode="sync">
             <motion.div
-              key={pathname} // Re-animate when the route changes
+              key={pathname} 
+	      className="absolute inset-0"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -41,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
              </motion.div>
           </AnimatePresence>
+	  */}
+	{children}
         </AuthProvider>
       </body>
     </html>
