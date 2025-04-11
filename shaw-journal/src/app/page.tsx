@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
 import { auth } from "../firebase";
 import Link from "next/link";
 import { useAuth } from "../components/context/AuthContext"; // Import useAuth
@@ -28,9 +28,17 @@ export default function LoginPage() {
     }
   };
 
-  const handleGuestLogin = () => {
-    router.push("/home"); // Redirect to home
-  };
+	const handleGuestLogin = async () => {
+	  try {
+	    await signInAnonymously(auth);
+	    router.push("/home");
+	  } catch (error: any) {
+	    console.error("Guest login failed:", error.message);
+	    setError("Failed to sign in as guest");
+	  }
+	};
+
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
@@ -64,7 +72,7 @@ export default function LoginPage() {
             required
             className="w-full p-2 mb-4 border rounded"
           />
-          <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded mb-4"> {/* Added margin-bottom */}
+          <button type="submit" className="w-full bg-[#800020] text-white p-2 rounded mb-4 cursor-pointer"> {/* Added margin-bottom */}
             Login
           </button>
         </form>
@@ -72,7 +80,7 @@ export default function LoginPage() {
         <div className="text-center mt-4">
           <button
             onClick={handleGuestLogin}
-            className="text-sm text-indigo-600 hover:text-indigo-800 underline cursor-pointer"
+            className="w-full bg-[#EFBF04] text-white p-2 rounded mb-4 cursor-pointer"
           >
             Login as Guest
           </button>

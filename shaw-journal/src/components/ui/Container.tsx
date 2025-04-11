@@ -10,7 +10,7 @@ import 'aos/dist/aos.css';
 AOS.init();
 
 export default function Container({ children }: { children: React.ReactNode }) {
-  const { user, loadingUser, isGuest } = useAuth();
+  const { user  } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -22,7 +22,9 @@ export default function Container({ children }: { children: React.ReactNode }) {
     }
   };
 
-
+ if (user?.isAnonymous) {
+  console.log("This is a guest user");
+}
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
