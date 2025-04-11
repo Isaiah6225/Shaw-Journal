@@ -20,7 +20,7 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/home"); // Redirect to the home page after successful login
     } catch (error: any) {
-      if (error.code === "auth/invalid-credential") {
+      if (error.code ) {
         setError("Incorrect username/password");
       } else {
         setError(error.message); // Display other error messages
