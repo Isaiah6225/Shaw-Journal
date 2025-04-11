@@ -6,37 +6,51 @@ import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Link from "next/link";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
-import BlogCard from "../../components/BlogCard";
+import BlogCardHome from "../../components/BlogCardHome";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
+import   useAOS  from "../../components/hooks/useAOS";
 
-export default function SportsPage() {
-  const { blogs: sportsBlogs, loading, error } = useFetchBlogs({category: "Sports", status:"approved"});   
+export default function EntertainmentPage() {
+  const { blogs: sportsBlogs, loading: loadingSports, error } = useFetchBlogs({category: "Sports", status:"approved"}); 
 
+  useAOS();
+
+  
+  const isLoading = loadingSports;
+  
+  const renderBlogCards = (blogs) =>
+    blogs.map((blog) => (
+      <BlogCardHome
+        key={blog.id}
+        id={blog.id}
+        title={blog.title}
+        article={blog.article}
+        author={blog.name}
+	createdAt={blog.createdAt}
+	imageUrl={blog.imageUrl}
+	status={blog.status}
+      />
+    ));
 
   return (
     <PrivateRoutes>
       <Container>
-	{loading && <p>Loading...</p>}
+      {isLoading ? (
+      	<div className="text-center my-20 text-xl font-semibold">Loading blogs...</div>
+	) : (
+	<>
         {error && <p className="text-red-500">{error}</p>}
 
-
-        {/* Display Blogs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	{sportsBlogs.map((blog) => (
-	       <BlogCard 
-              	key={blog.id}
-              	id={blog.id}
-              	title={blog.title}
-              	article={blog.article}
-              	author={blog.name}
-              	upvotes={blog.upvotes || 0}
-              	createdAt={blog.createdAt}
-              	comments={blog.comments || []}
-		status={blog.status}
-            />
-          ))}
+        <div className="sticky top-0 z-10 bg-primary py-2">
+        <h1 className="text-3xl font-bold text-center text-black">Sports Blogs</h1>
         </div>
 
+        {/* Display Blogs */}
+        <div className="flex flex-col space-y-4" data-aos="fade-up" data-aos-duration="1200">
+        {renderBlogCards(sportsBlogs)}
+        </div>
+	</>
+	)}
       </Container>
     </PrivateRoutes>
   );

@@ -5,15 +5,21 @@ import { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../../components/context/AuthContext";
-import BlogCard from "../../components/BlogCard";
+import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import Container from "../../components/ui/Container";
 import PrivateRoutes from "../../components/PrivateRoutes";
+import  useAOS  from "../../components/hooks/useAOS";
+
+
 
 export default function LikedPostsPage() {
   const { user } = useAuth();
   const [likedBlogs, setLikedBlogs] = useState([]);
+  useAOS();
 
   useEffect(() => {
+
+    
     if (!user) return;
 
     const fetchLikedBlogs = async () => {
@@ -44,9 +50,17 @@ export default function LikedPostsPage() {
   <Container>
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Liked Posts</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-aos="fade-up" data-aos-duration="1200">
         {likedBlogs.length > 0 ? (
-          likedBlogs.map((blog) => <BlogCard key={blog.id} {...blog} />)
+          likedBlogs.map((blog) => <BlogCardLargeHome 
+	  				key={blog.id} 
+					id={blog.id}
+					title={blog.title}
+					article={blog.article}
+					author={blog.name}
+					imageUrl={blog.imageUrl}
+					status={blog.status}
+				    />)
         ) : (
           <p>No liked posts yet.</p>
         )}
