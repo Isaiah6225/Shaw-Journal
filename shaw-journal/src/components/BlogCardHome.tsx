@@ -16,7 +16,7 @@ export default function BlogCardHome({ id, title, article, author, createdAt, st
   const router = useRouter();
   const popup = usePopup();
   const { isLiked, likesCount, toggleLike } = useLikes(id);
-  const { user, loadingUser } = useAuth();	
+  const { loading: loadingUser, uid } = useAuth();	
 
 
 

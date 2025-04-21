@@ -1,7 +1,6 @@
 "use client";
 
 import Container from "../../../components/ui/Container";
-import PrivateRoutes from "../../../components/PrivateRoutes";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../firebase";
@@ -23,7 +22,7 @@ export default function BlogPage() {
   const [newComment, setNewComment] = useState<string>("");
   const router = useRouter();
   const [refreshComments, setRefreshComments] = useState(false);
-  const { user, loadingUser, isGuest } = useAuth(); 
+  const { username, uid, loading: loadingUser, role } = useAuth(); 
   const { isLiked, likesCount, toggleLike } = useLikes(id);
   const { comments, loading: loadingComments } = useFetchComments(id as string, refreshComments);
 
@@ -35,6 +34,7 @@ export default function BlogPage() {
 	  text: string;
 	  timestamp: Date;
 	};
+
 
   useEffect(() => {
     if(loadingUser) return;
@@ -74,17 +74,10 @@ export default function BlogPage() {
         timestamp: new Date(),
       };
 
-      if (user) {
-        const userRef = doc(db, "users", user.uid); 
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          commentToAdd.userName = userSnap.data().name || "Unknown User";
-        } else {
-          commentToAdd.userName = "Anonymous";
-        }
+      if (uid) {
+          commentToAdd.userName = username || "Unknown User";
       } else {
-        const guestName = localStorage.getItem("guestName");
-        commentToAdd.userName = guestName || "Guest";
+	commentToAdd.userName = "Anonymous";
       }
 
       const blogRef = doc(db, "blogs", blogId); 
@@ -154,7 +147,7 @@ export default function BlogPage() {
   if (!blog) return <p className="text-center mt-10">{message || "Loading blog..."}</p>;
 
   return (
-    <PrivateRoutes>
+    
       <Container>
         
       {blog.imageUrl && (
@@ -276,7 +269,7 @@ export default function BlogPage() {
           </div>
 			
 	  {/* Editor Actions*/}
-          {(user?.role === "Editor" && blog.status !== "approved") && (
+          {(role === "Editor" && blog.status !== "approved") && (
             <div className="flex justify-between mt-6 text-sm">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg"
@@ -296,7 +289,6 @@ export default function BlogPage() {
           )}
         </div>
       </Container>
-    </PrivateRoutes>
   );
 }
 

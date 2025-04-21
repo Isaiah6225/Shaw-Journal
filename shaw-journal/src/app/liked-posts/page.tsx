@@ -7,24 +7,19 @@ import { collection, query, where, getDocs, doc, getDoc } from "firebase/firesto
 import { useAuth } from "../../components/context/AuthContext";
 import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import Container from "../../components/ui/Container";
-import PrivateRoutes from "../../components/PrivateRoutes";
 import  useAOS  from "../../components/hooks/useAOS";
 
 
 
 export default function LikedPostsPage() {
-  const { user } = useAuth();
+  const { uid, role, loading: userLoading } = useAuth();
   const [likedBlogs, setLikedBlogs] = useState([]);
   useAOS();
 
   useEffect(() => {
-
-    
-    if (!user) return;
-
     const fetchLikedBlogs = async () => {
       try {
-        const likesQuery = query(collection(db, "likes"), where("userId", "==", user.uid));
+        const likesQuery = query(collection(db, "likes"), where("userId", "==", uid));
         const likesSnapshot = await getDocs(likesQuery);
         const likedBlogIds = likesSnapshot.docs.map((doc) => doc.data().blogId);
 
@@ -43,10 +38,9 @@ export default function LikedPostsPage() {
     };
 
     fetchLikedBlogs();
-  }, [user]);
+  }, [uid]);
 
   return (
-  <PrivateRoutes>
   <Container>
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Liked Posts</h1>
@@ -67,7 +61,6 @@ export default function LikedPostsPage() {
       </div>
     </div>
   </Container>
-  </PrivateRoutes>
   );
 }
 

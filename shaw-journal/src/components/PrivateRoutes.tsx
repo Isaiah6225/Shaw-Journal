@@ -1,42 +1,41 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "../firebase"; // ✅ Ensure correct import
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useAuth } from "./context/AuthContext";
 
-export default function PrivateRoutes({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+export default function PrivateRoutes({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
+/**
+  const { user } = useAuth();
+  const role = user?.role;
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.replace("/"); // Redirect if not authenticated
-      }
-      setLoading(false);
-    });
+    if (user === null) {
+      console.log("Current user: ", user);
+      router.replace("/");
+      return;
+    }
 
-    return () => unsubscribe(); // Cleanup listener
-  }, [router]);
+    if (allowedRoles && (!role || !allowedRoles.includes(role))) {
+      console.log("Current user role: ", role); 
+      router.replace("/unauthorized");
+    }
+  }, [user, role, router, allowedRoles]);
 
-
-
-  if (loading) {
-    return <p>Loading...</p>; // ✅ Show loading state instead of blank screen
+  if (user === null || (allowedRoles && (!role || !allowedRoles.includes(role)))) {
+    return <p>Loading...</p>;
   }
 
-  if (!user) {
-    return null; // Prevent unauthorized content flash
-  }
-
-  return (
-    <div>
-      {children}
-    </div>
-  );
+  return <>{children}</>;
+  **/
 }
+
 

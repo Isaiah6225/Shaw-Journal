@@ -4,7 +4,7 @@ import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 
 export function useFetchBlogsSub() {
-  const { user } = useAuth();   
+  const { uid } = useAuth();   
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,15 +12,11 @@ export function useFetchBlogsSub() {
   useEffect(() => {
     const fetchBlogSub = async () => {
       try {
-        if (!user) {
-          setError("No user found.");
-          return;
-        }
+
 	
-	console.log("Current user: ", user.uid);
 
         //Get all blog IDs from the user's blogs subcollection
-        const userBlogRef = collection(db, `users/${user.uid}/blogs`);
+        const userBlogRef = collection(db, `users/${uid}/blogs`);
         const userBlogSnapshot = await getDocs(userBlogRef);
 	
         
@@ -28,11 +24,11 @@ export function useFetchBlogsSub() {
         const blogIds = userBlogSnapshot.docs.map((doc) => doc.id);
 
 	
-
+        /**
         if (blogIds.length === 0) {
           setError("No blogs found for this user.");
           return;
-        }
+        }**/
 
         //Fetch the actual blog data from the blogs collection
         const blogPromises = blogIds.map(async (blogId) => {
@@ -61,7 +57,7 @@ export function useFetchBlogsSub() {
     };
 
     fetchBlogSub();
-  }, [user]); // Re-run the effect when the user changes
+  }, [uid]); // Re-run the effect when the user changes
 
   return { blogs, loading, error };
 }
