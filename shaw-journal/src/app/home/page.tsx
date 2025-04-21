@@ -3,13 +3,16 @@
 import { useEffect } from "react";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 import Container from "../../components/ui/Container";
-import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import BlogCardHome from "../../components/BlogCardHome";
 import  useAOS  from "../../components/hooks/useAOS";
-
+import { useAuth } from "../../components/context/AuthContext";
+import Loading from "../../components/ui/Loading";
 
 export default function HomePage() {
+  const { role, loading: userLoading } = useAuth();
+ 
+
   // Fetch newest blogs from Firestore
   const { blogs: generalBlogs, loading: loadingGeneral} = useFetchBlogs({ category: "General", status: "approved", limitCount: 1 });
   const { blogs: technologyBlogs ,loading: loadingTechnology} = useFetchBlogs({ category: "Tech", status: "approved", limitCount: 1 });
@@ -58,13 +61,14 @@ export default function HomePage() {
 	));
 
   return (
-    <PrivateRoutes>
       <Container>
-      {isLoading ? (
-        <div className="text-center my-20 text-xl font-semibold">Loading blogs...</div>
+
+        {error && <p className="text-red-500">{error}</p>}
+
+	{(userLoading || !role || isLoading) ? (
+      	<Loading />
 	) : ( 
 	  <>
-        {error && <p className="text-red-500">{error}</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 my-12" >
           {/* LEFT: General + Tech */}
@@ -146,7 +150,6 @@ export default function HomePage() {
 	</>
 	)}
       </Container>
-    </PrivateRoutes>
   );
 }
 

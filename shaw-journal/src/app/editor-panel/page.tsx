@@ -4,16 +4,30 @@ import { useEffect } from "react";
 import { db } from "../../firebase";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 import Container from "../../components/ui/Container";
-import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCardLargeHome from "../../components/BlogCardLargeHome";
 import  useAOS  from "../../components/hooks/useAOS";
+import Loading from "../../components/ui/LoadingBackground";
+import { useAuth } from "../../components/context/AuthContext"; 
+import { useRouter } from "next/navigation";
 
 export default function EditorPage() {
   const { blogs: pendingBlogs, loading, error } = useFetchBlogs({ status: "pending" });
   const { blogs: rejectedBlogs } = useFetchBlogs({ status: "rejected" });
+  const {role, loading: userLoading } = useAuth();
+  const router = useRouter();
 
   useAOS();
 
+  useEffect(() => {
+    if (!userLoading && role && role !== "Editor") {
+      router.push("/unauthorized");
+    }
+  }, [role, router, userLoading]); // Run this effect whenever the role changes
+
+  // Show nothing if role is known and not authorized
+  if (!userLoading && role && role !== "Editor") {
+    return null;
+  }
 
   const renderBlogCards = (blogs) =>
     blogs.map((blog) => (
@@ -29,8 +43,9 @@ export default function EditorPage() {
     ));
 
   return (
-    <PrivateRoutes>
       <Container>
+        {(userLoading || !role) && <Loading />} 
+	
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
@@ -46,7 +61,6 @@ export default function EditorPage() {
           </div>
         </div>
       </Container>
-    </PrivateRoutes>
   );
 }
 

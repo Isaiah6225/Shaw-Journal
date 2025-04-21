@@ -15,7 +15,7 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
   const [editArticle, setEditArticle] = useState(article);
   const [editTitle, setEditTitle] = useState(title);
   const popup = usePopup();
-  const { user, loadingUser } = useAuth();
+  const { loading: loadingUser, uid, role  } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +100,7 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
       </Link>
 
       {/* Editor and Author actions below  the card */}
-      {(status === "pending" || status === "rejected") && (user?.role === "Author" || user?.role === "Editor") && (
+      {(status === "pending" || status === "rejected") && (role === "Author" || role === "Editor") && (
         <div className="mt-2 flex items-center space-x-3">
           <div className="p-4 border rounded-lg bg-gray-50 mb-4">
             <p
@@ -119,7 +119,7 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
             </button>
           </div>
 
-          {user?.role === "Author" && (
+          {role === "Author" && (
             <div className="p-4 border rounded-lg bg-gray-50 mb-4">
               <button
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 mb-4"

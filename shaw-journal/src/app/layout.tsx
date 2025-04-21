@@ -6,8 +6,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { metadata } from "./metadata"; // Import metadata from separate file
-import { AuthProvider } from "../components/context/AuthContext"; // Import AuthProvider
+import { metadata } from "./metadata"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,23 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="description" content={metadata.description} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased `} >
-        <AuthProvider>
-	{/*
-          <AnimatePresence mode="sync">
-            <motion.div
-              key={pathname} 
-	      className="absolute inset-0"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
-            >
-                {children}
-             </motion.div>
-          </AnimatePresence>
-	  */}
-	{children}
-        </AuthProvider>
+
+        {children}
       </body>
     </html>
   );

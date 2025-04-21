@@ -1,7 +1,7 @@
 "use client";
 
 import Container from "../../components/ui/Container";
-import PrivateRoutes from "../../components/PrivateRoutes";
+import Loading from "../../components/ui/LoadingBackground";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,23 +21,24 @@ export default function CreateBlog() {
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);	
 
-  const { user, isGuest, loadingUser } = useAuth(); // Get isGuest and loadingUser
+  const { role, loading: userLoading, uid } = useAuth(); 
   const router = useRouter();
 
-  // Redirect guest users
   useEffect(() => {
-    if (!loadingUser && isGuest) {
-      router.push("/home"); // Redirect guests away
+    if (!userLoading && role && role !== "Author") {
+      router.push("/unauthorized");
     }
-  }, [isGuest, loadingUser, router]);
+  }, [role, router, userLoading]); 
+
+  // Show nothing if role is known and not authorized
+  if (!userLoading && role && role !== "Author") {
+    return null;
+  }
+
 
   // Function to handle blog submission
   const handleSubmit = async (e: React.FormEvent) => {
-    // Double check user is not guest before submitting (though redirect should prevent this)
-    if (isGuest || !user) {
-      setMessage("Guests cannot create blogs.");
-      return;
-    }
+
     e.preventDefault();
     if (!title || !name || !article || !category) {
       setMessage("All fields are required.");
@@ -65,8 +66,8 @@ export default function CreateBlog() {
       });
 
       //save blog to specific current user - Ensure user exists and is not guest
-      if (user && !isGuest) {
-         await setDoc(doc(db, `users/${user.uid}/blogs`, blogRef.id), {});
+      if (uid) {
+         await setDoc(doc(db, `users/${uid}/blogs`, blogRef.id), {});
       } else {
          throw new Error("User not authenticated or is a guest.");
       }
@@ -79,15 +80,12 @@ export default function CreateBlog() {
     }
   };
 
-  // Render nothing or a loading indicator while checking auth/guest status
-  if (loadingUser || isGuest) {
-    return <p>Loading...</p>; // Or a more specific message/redirect handled by useEffect
-  }
+
 
   // Render the form only if the user is logged in and not a guest
   return (
-    <PrivateRoutes>
   <Container>
+    {(userLoading || !role) && <Loading />} 
     <div className="max-w-7xl mx-auto p-6">
       {message && <p className="text-red-500 mb-4">{message}</p>}
 
@@ -178,6 +176,5 @@ export default function CreateBlog() {
       </div>
     </div>
   </Container>
-</PrivateRoutes>
   );
 }

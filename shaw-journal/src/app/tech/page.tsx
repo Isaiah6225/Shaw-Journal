@@ -5,21 +5,21 @@ import { db } from "../../firebase";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Link from "next/link";
 import Container from "../../components/ui/Container";
-import PrivateRoutes from "../../components/PrivateRoutes";
 import BlogCardHome from "../../components/BlogCardHome";
 import { useFetchBlogs } from "../../components/hooks/useFetchBlogs";
 import  useAOS  from "../../components/hooks/useAOS";
-
+import { useAuth } from "../../components/context/AuthContext"; 
+import Loading from "../../components/ui/Loading"; 
 
 
 
 export default function EntertainmentPage() {
   const { blogs: techBlogs, loading: loadingTech, error } = useFetchBlogs({category: "Tech", status:"approved"}); 
-  
+  const { role, loading: userLoading } =useAuth();
+
   useAOS();
 
 
-  const isLoading = loadingTech;
   
   const renderBlogCards = (blogs) =>
     blogs.map((blog) => (
@@ -37,18 +37,18 @@ export default function EntertainmentPage() {
     ));
 
   return (
-    <PrivateRoutes>
       <Container>
-      {isLoading ? (
-      	<div className="text-center my-20 text-xl font-semibold">Loading blogs...</div>
-	) : (
-	<>
+
         {error && <p className="text-red-500">{error}</p>}
 
         <div className="sticky top-0 z-10 bg-primary py-2">
-        <h1 className="text-3xl font-bold text-center text-black">Technology Blogs</h1>
+        	<h1 className="text-3xl font-bold text-center text-black">Technology Blogs</h1>
         </div>
-
+        
+	{(userLoading || !role || loadingTech) ? (
+      	<Loading />
+	) : (
+	<>
         {/* Display Blogs */}
         <div className="flex flex-col space-y-4" data-aos="fade-up" data-aos-duration="1200">
         {renderBlogCards(techBlogs)}
@@ -56,6 +56,5 @@ export default function EntertainmentPage() {
 	</>
 	)}
       </Container>
-    </PrivateRoutes>
   );
 }

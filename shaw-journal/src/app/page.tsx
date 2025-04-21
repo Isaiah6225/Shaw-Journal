@@ -14,29 +14,70 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/home"); // Redirect to the home page after successful login
-    } catch (error: any) {
-      if (error.code ) {
-        setError("Incorrect username/password");
-      } else {
-        setError(error.message); // Display other error messages
-      }
-    }
-  };
+	const handleLogin = async (e: React.FormEvent) => {
+	  e.preventDefault();
+	  try {
+	    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+	    const user = userCredential.user; // Get the user object after successful login
+
+	    // Get the token after user is signed in
+	    const token = await user.getIdToken(); 
+
+	    if (token) {
+	      // Send the token to the server to set it as an HttpOnly cookie
+		await fetch('/api/set-token', {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ token }),
+		  credentials: 'include', 
+		});
+
+	    }
+
+	    router.push("/home"); 
+	  } catch (error: any) {
+	    if (error.code) {
+	      setError("Incorrect username/password");
+	    } else {
+	      setError(error.message); // Display other error messages
+	    }
+	  }
+	};
+
+
+
 
 	const handleGuestLogin = async () => {
 	  try {
-	    await signInAnonymously(auth);
+	    const userCredential = await signInAnonymously(auth);
+	    const uid = userCredential.user.uid;
+	    const username = `Guest${Math.floor(1000 + Math.random() * 9000)}`;
+
+	    // Call API to set custom claims
+	    await fetch("/api/set-claim", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({ uid, role: "Guest", username }),
+	    });
+
+	    // Force token refresh to get the new claims
+	    await userCredential.user.getIdToken(true);
+
+	    // Set token in cookie
+	    const token = await userCredential.user.getIdToken();
+	    await fetch("/api/set-token", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({ token }),
+	    });
+
 	    router.push("/home");
 	  } catch (error: any) {
 	    console.error("Guest login failed:", error.message);
 	    setError("Failed to sign in as guest");
 	  }
 	};
+
 
 
 
