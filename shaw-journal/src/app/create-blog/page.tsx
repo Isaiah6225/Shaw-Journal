@@ -14,14 +14,13 @@ import { storage } from "../../firebase";
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
-  const [name, setName] = useState("");
   const [article, setArticle] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);	
 
-  const { role, loading: userLoading, uid } = useAuth(); 
+  const { role, loading: userLoading, uid, username } = useAuth(); 
   const router = useRouter();
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function CreateBlog() {
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault();
-    if (!title || !name || !article || !category) {
+    if (!title || !username || !article || !category) {
       setMessage("All fields are required.");
       return;
     }
@@ -57,7 +56,7 @@ export default function CreateBlog() {
 
       const blogRef = await addDoc(collection(db, "blogs"), {
         title,
-        name,
+        name: username,
         article,
         category,
 	imageUrl,
@@ -91,31 +90,30 @@ export default function CreateBlog() {
 
       {/* Side-by-side layout */}
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Card on the left */}
        {/* Card on the left */}
-<div className="md:w-1/3 flex flex-col space-y-6">
-  {/* Tips Card */}
-  <div className="border border-gray-300 bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
-    <h2 className="text-xl font-semibold">Tips for Writing</h2>
-    <ul className="list-disc pl-5 text-sm text-gray-600">
-      <li>Be clear and concise</li>
-      <li>Engage your audience</li>
-      <li>Use proper formatting</li>
-      <li>Proofread before posting</li>
-    </ul>
-  </div>
+	<div className="md:w-1/3 flex flex-col space-y-6">
+	  {/* Tips Card */}
+	  <div className="border border-gray-300 bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
+	    <h2 className="text-xl font-semibold">Tips for Writing</h2>
+	    <ul className="list-disc pl-5 text-sm text-gray-600">
+	      <li>Be clear and concise</li>
+	      <li>Engage your audience</li>
+	      <li>Use proper formatting</li>
+	      <li>Proofread before posting</li>
+	    </ul>
+	  </div>
 
-  {/* Markdown Key Card */}
-  <div className="border border-gray-300 bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
-    <h2 className="text-xl font-semibold">Markdown Key</h2>
-    <ul className="list-disc pl-5 text-sm text-gray-600">
-      <li># Heading</li>
-      <li>**Bold text**</li>
-      <li>*Italic text*</li>
-      <li>`Inline code`</li>
-    </ul>
-  </div>
-</div>
+	  {/* Markdown Key Card */}
+	  <div className="border border-gray-300 bg-[#FAF9F6] shadow-lg rounded-lg p-4 hover:shadow-xl transition space-y-3">
+	    <h2 className="text-xl font-semibold">Markdown Key</h2>
+	    <ul className="list-disc pl-5 text-sm text-gray-600">
+	      <li># Heading</li>
+	      <li>**Bold text**</li>
+	      <li>*Italic text*</li>
+	      <li>`Inline code`</li>
+	    </ul>
+	  </div>
+	</div>
 
         {/* Form on the right */}
         <form
@@ -137,14 +135,7 @@ export default function CreateBlog() {
             required
             className="p-2 border rounded"
           />
-          <input
-            type="text"
-            placeholder="Author"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="p-2 border rounded"
-          />
+
           <textarea
             placeholder="Write your article here..."
             value={article}
