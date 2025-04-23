@@ -4,34 +4,26 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./context/AuthContext";
-import { usePopup } from "./hooks/usePopup";
-import Popup from "./Popup";
 import { useState } from "react";
 import { db } from "../firebase";
 import { updateDoc, doc, deleteDoc } from "firebase/firestore";
 
-export default function BlogCardlargeHome({ id, imageUrl, title, article, author, status }) {
+type BlogCardHomeProps = {
+  id: string;
+  imageUrl: string;
+  title: string;
+  article: string;
+  author: string;
+  status: string;
+  category?: string;  // Make category optional
+  createdAt?: string;  // Make createdAt optional
+};
+
+export default function BlogCardlargeHome({ id, imageUrl, title, article, author, status }: BlogCardHomeProps) {
   const router = useRouter();
-  const [editArticle, setEditArticle] = useState(article);
-  const [editTitle, setEditTitle] = useState(title);
-  const popup = usePopup();
   const { loading: loadingUser, uid, role  } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const blogRef = doc(db, "blogs", id);
-      await updateDoc(blogRef, {
-        article: editArticle,
-        title: editTitle,
-        status: "pending",
-      });
-      popup.close();
-      router.replace("/home");
-    } catch (error) {
-      console.log("Edit article failed: ", error);
-    }
-  };
+
 
   const handleDelete = async () => {
     try {
@@ -119,44 +111,6 @@ export default function BlogCardlargeHome({ id, imageUrl, title, article, author
             </button>
           </div>
 
-          {role === "Author" && (
-            <div className="p-4 border rounded-lg bg-gray-50 mb-4">
-              <button
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 mb-4"
-                onClick={popup.open}
-              >
-                Edit Blog
-              </button>
-
-              <Popup isOpen={popup.isOpen} close={popup.close}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-                  <h1 className="text-xl font-bold">Edit Blog</h1>
-
-                  <label className="text-md font-semibold">Title</label>
-                  <textarea
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="p-2 border rounded h-10"
-                  />
-
-                  <label className="text-md font-semibold">Article</label>
-                  <textarea
-                    value={editArticle}
-                    onChange={(e) => setEditArticle(e.target.value)}
-                    className="p-2 border rounded h-40"
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={!editArticle.trim()}
-                    className="bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white px-4 py-2 rounded-lg transition duration-200"
-                  >
-                    Submit
-                  </button>
-                </form>
-              </Popup>
-            </div>
-          )}
         </div>
       )}
     </div>

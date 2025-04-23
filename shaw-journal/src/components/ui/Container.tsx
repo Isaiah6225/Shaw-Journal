@@ -7,15 +7,19 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import  useAOS  from "../hooks/useAOS";
-
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 export default function Container({ children }: { children: React.ReactNode }) {
-  const { role, username } = useAuth();
-  const router = useRouter();
+  	const { role, username } = useAuth();
+  	const router = useRouter();
 
-  useAOS();
+  	useAOS();
         
 
+ 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  	const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
 	const handleLogout = async () => {
 	  const user = auth.currentUser;
@@ -58,18 +62,29 @@ export default function Container({ children }: { children: React.ReactNode }) {
 	      <Link href="/food" className="text-lg font-bold">Food</Link>
 	    </nav>
 
-	    {/* Right: Actions */}
-	    <div className="flex items-center gap-3 flex-wrap justify-end">
-	      {role === "Author" && (
-		<>
-		  <Link href="/create-blog" className="bg-[#EFBF04] text-white px-4 py-2 rounded-lg whitespace-nowrap">
-		    + Create Blog
-		  </Link>
-		  <Link href="/edit-posts" className="bg-[#EFBF04] text-white px-4 py-2 rounded-lg whitespace-nowrap">
-		  	✏️ Check Blogs
-		  </Link>
-		</>
-	      )}
+	  {/* Right: Actions */}
+          <div className="flex items-center gap-3 flex-wrap justify-end relative">
+            {/* Author Dropdown */}
+            {role === "Author" && (
+              <div className="relative">
+                <button
+                  onClick={toggleDropdown}
+                  className="bg-[#EFBF04] text-white px-4 py-2 rounded-lg flex items-center gap-1 cursor-pointer"
+                >
+                  ✍️ Author Actions <ChevronDown className="w-4 h-4" />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50 overflow-hidden">
+                    <Link href="/create-blog" className="block px-4 py-2 text-[#800020] hover:bg-gray-100">+ Create Blog</Link>
+                    <Link href="/edit-posts" className="block px-4 py-2 text-[#800020] hover:bg-gray-100">✏️ Check Blogs</Link>
+                    <Link href="/markdown-guide" className="block px-4 py-2 text-[#800020] hover:bg-gray-100">📄 Posting Guide</Link>
+
+
+                  </div>
+                )}
+              </div>
+            )}
 
 	      {(role === "Author" || role === "Editor") && (
 		<Link href="/liked-posts" className="bg-[#EFBF04] text-white px-4 py-2 rounded-lg whitespace-nowrap">

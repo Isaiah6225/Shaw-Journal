@@ -27,6 +27,7 @@ export const config = {
     "/sports",
     "/liked-posts",
     "/food",
+    "/markdown-guide"
   ],
 };
 

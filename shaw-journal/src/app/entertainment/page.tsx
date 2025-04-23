@@ -39,10 +39,10 @@ export default function EntertainmentPage() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <div className="sticky top-0 z-10 bg-primary py-2">
-        	<h1 className="text-3xl font-bold text-center text-black">Entertainment Blog</h1>
-        </div>
-	
+	<div className="space-y-6 ">
+	    <h1 className="text-xl font-semibold uppercase tracking-wide border-b pb-2 text-center">
+		     Entertainment 🎭 
+	    </h1>
 	{(userLoading || !role || loadingEntertainment) ? (
       	<Loading />	
 	) : (
@@ -53,6 +53,7 @@ export default function EntertainmentPage() {
         </div>
 	</>
 	)}
+	</div>
       </Container>
   );
 }

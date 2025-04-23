@@ -11,7 +11,17 @@ import { collection, updateDoc, doc, deleteDoc} from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-export default function BlogCardHome({ id, title, article, author, createdAt, status, imageUrl}) {
+interface BlogCardHomeProps {
+  id: string;
+  title: string;
+  article: string;
+  author: string;
+  createdAt: any; // Add createdAt here
+  imageUrl: string;
+  status: string;
+}
+
+export default function BlogCardHome({ id, title, article, author, createdAt, status, imageUrl}: BlogCardHomeProps) {
   
   const router = useRouter();
   const popup = usePopup();
